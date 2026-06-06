@@ -57,3 +57,7 @@ For `npm run smoke`, set `SMOKE_ADMIN_PASSWORD` in your local `.env`.
 - Add Razorpay keys for hosted payment links.
 - Add SMTP credentials for real email delivery.
 - Add Twilio credentials and set `NOTIFY_CHANNELS=email,sms,whatsapp` for SMS/WhatsApp notifications.
+- Roles supported: `owner`, `admin`, `manager`, `accountant`, `caretaker`, `tenant`.
+- Set `SENTRY_DSN`, `ERROR_WEBHOOK_URL`, or `LOGTAIL_SOURCE_TOKEN` for external error monitoring.
+- Set Cloudinary or S3 variables to store uploaded QR/images as URLs.
+- Optional scale mode: set `DB_MODE=collections` to store data across separate MongoDB collections.

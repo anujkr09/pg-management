@@ -7,6 +7,8 @@ const path = require("node:path");
 const { URL } = require("node:url");
 const { MongoClient } = require("mongodb");
 const nodemailer = require("nodemailer");
+const { PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
+const Sentry = require("@sentry/node");
 
 const root = __dirname;
 const dbFile = path.join(root, "data", "db.json");
@@ -19,14 +21,34 @@ const maxLoginAttempts = Number(process.env.LOGIN_MAX_ATTEMPTS || 8);
 const isProduction = process.env.NODE_ENV === "production";
 const publicBaseUrl = String(process.env.PUBLIC_BASE_URL || `http://localhost:${port}`).replace(/\/$/, "");
 const collections = new Set(["tenants", "rooms", "payments", "complaints", "notices", "services", "staff", "inventory", "expenses", "paymentSettings"]);
+const rolePermissions = {
+  owner: ["*"],
+  admin: ["*"],
+  manager: ["tenants:read", "tenants:write", "rooms:read", "rooms:write", "complaints:read", "complaints:write", "notices:read", "notices:write", "services:read", "services:write", "staff:read", "staff:write", "inventory:read", "inventory:write", "payments:read", "backup:read", "audit:read", "outbox:read"],
+  accountant: ["payments:read", "payments:write", "payments:verify", "expenses:read", "expenses:write", "paymentSettings:read", "paymentSettings:write", "backup:read", "audit:read", "outbox:read", "outbox:write"],
+  caretaker: ["rooms:read", "complaints:read", "complaints:write", "services:read", "services:write", "inventory:read", "notices:read"],
+  tenant: ["self:read", "complaints:write", "services:write", "payments:submit", "payments:read", "notices:read"]
+};
 let mongoClient = null;
+let mongoDb = null;
 let mongoStore = null;
 let mailTransporter = null;
 let etherealAccount = null;
+let s3Client = null;
+const arrayCollections = ["tenants", "rooms", "payments", "complaints", "notices", "services", "staff", "inventory", "expenses", "auditLogs", "errorLogs", "outbox", "sessions", "users"];
+const singletonCollections = ["paymentSettings", "security"];
 
 function loadSeedDb() {
   const source = fs.existsSync(dbFile) ? dbFile : sampleDbFile;
   return JSON.parse(fs.readFileSync(source, "utf8"));
+}
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || "development",
+    tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || 0)
+  });
 }
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
@@ -46,12 +68,70 @@ function timingSafeTextEqual(a = "", b = "") {
   return left.length === right.length && crypto.timingSafeEqual(left, right);
 }
 
+function parseDataImage(value = "") {
+  const match = String(value).match(/^data:image\/(png|jpeg|jpg|webp|gif);base64,(.+)$/i);
+  if (!match) return null;
+  return {
+    ext: match[1].toLowerCase().replace("jpeg", "jpg"),
+    contentType: `image/${match[1].toLowerCase().replace("jpg", "jpeg")}`,
+    buffer: Buffer.from(match[2], "base64")
+  };
+}
+
+async function storeImageIfConfigured(value, folder = "uploads") {
+  const image = parseDataImage(value);
+  if (!image) return value;
+  if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_UPLOAD_PRESET) {
+    const form = new FormData();
+    form.set("file", value);
+    form.set("upload_preset", process.env.CLOUDINARY_UPLOAD_PRESET);
+    form.set("folder", folder);
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(process.env.CLOUDINARY_CLOUD_NAME)}/image/upload`, {
+      method: "POST",
+      body: form
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error?.message || `Cloudinary returned ${response.status}`);
+    return data.secure_url || data.url || value;
+  }
+  if (process.env.S3_BUCKET && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+    s3Client ||= new S3Client({
+      region: process.env.AWS_REGION || "ap-south-1",
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+      }
+    });
+    const key = `${folder}/${Date.now()}-${crypto.randomBytes(6).toString("hex")}.${image.ext}`;
+    await s3Client.send(new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET,
+      Key: key,
+      Body: image.buffer,
+      ContentType: image.contentType,
+      ACL: process.env.S3_PUBLIC_READ === "true" ? "public-read" : undefined
+    }));
+    if (process.env.S3_PUBLIC_BASE_URL) return `${process.env.S3_PUBLIC_BASE_URL.replace(/\/$/, "")}/${key}`;
+    return `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION || "ap-south-1"}.amazonaws.com/${key}`;
+  }
+  return value;
+}
+
 async function initStorage() {
   if (!process.env.MONGODB_URI) return;
   mongoClient = new MongoClient(process.env.MONGODB_URI);
   await mongoClient.connect();
   const databaseName = process.env.MONGODB_DB || new URL(process.env.MONGODB_URI).pathname.replace("/", "") || "staywise_pg";
-  mongoStore = mongoClient.db(databaseName).collection("app_state");
+  mongoDb = mongoClient.db(databaseName);
+  if (process.env.DB_MODE === "collections") {
+    const meta = await mongoDb.collection("_meta").findOne({ _id: "main" });
+    if (!meta) {
+      const seed = loadSeedDb();
+      await writeCollections(seed);
+      await mongoDb.collection("_meta").replaceOne({ _id: "main" }, { _id: "main", initializedAt: new Date(), mode: "collections" }, { upsert: true });
+    }
+    return;
+  }
+  mongoStore = mongoDb.collection("app_state");
   const existing = await mongoStore.findOne({ _id: "main" });
   if (!existing) {
     await mongoStore.insertOne({ _id: "main", ...loadSeedDb() });
@@ -59,6 +139,7 @@ async function initStorage() {
 }
 
 async function readDb() {
+  if (mongoDb && process.env.DB_MODE === "collections") return readCollections();
   if (mongoStore) {
     const document = await mongoStore.findOne({ _id: "main" });
     if (!document) return loadSeedDb();
@@ -69,6 +150,10 @@ async function readDb() {
 }
 
 async function writeDb(db) {
+  if (mongoDb && process.env.DB_MODE === "collections") {
+    await writeCollections(db);
+    return;
+  }
   if (mongoStore) {
     await mongoStore.replaceOne({ _id: "main" }, { _id: "main", ...db }, { upsert: true });
     return;
@@ -77,8 +162,47 @@ async function writeDb(db) {
   fs.writeFileSync(dbFile, JSON.stringify(db, null, 2));
 }
 
+async function readCollections() {
+  const db = {};
+  for (const name of arrayCollections) {
+    db[name] = await mongoDb.collection(name).find({}).toArray();
+    db[name] = db[name].map(({ _id, ...item }) => item);
+  }
+  for (const name of singletonCollections) {
+    const doc = await mongoDb.collection(name).findOne({ _id: "main" });
+    const { _id, ...value } = doc || {};
+    db[name] = value || (name === "security" ? { loginAttempts: {} } : {});
+  }
+  return { ...loadSeedDb(), ...db };
+}
+
+async function writeCollections(db) {
+  for (const name of arrayCollections) {
+    const collection = mongoDb.collection(name);
+    await collection.deleteMany({});
+    const rows = (db[name] || []).map((item, index) => ({ _id: item.id || item.num || item.tokenHash || `${name}-${index}`, ...item }));
+    if (rows.length) await collection.insertMany(rows);
+  }
+  for (const name of singletonCollections) {
+    await mongoDb.collection(name).replaceOne({ _id: "main" }, { _id: "main", ...(db[name] || {}) }, { upsert: true });
+  }
+}
+
 function seedUser(id, role, name, email, password, meta) {
   return { id, role, name, email: String(email).toLowerCase(), ...hashPassword(password), meta, active: true, createdAt: nowStamp() };
+}
+
+function normalizeRole(role) {
+  return role === "admin" ? "admin" : String(role || "tenant");
+}
+
+function permissionsFor(user) {
+  return rolePermissions[normalizeRole(user?.role)] || [];
+}
+
+function can(user, permission) {
+  const permissions = permissionsFor(user);
+  return permissions.includes("*") || permissions.includes(permission);
 }
 
 async function ensureDb() {
@@ -148,6 +272,27 @@ function enqueueNotifications(db, recipient, subject, body, meta = {}) {
   if (channels.includes("email") && recipient.email) enqueueMessage(db, "email", recipient.email, subject, body, meta);
   if (channels.includes("sms") && recipient.phone) enqueueMessage(db, "sms", recipient.phone, subject, body, meta);
   if (channels.includes("whatsapp") && recipient.phone) enqueueMessage(db, "whatsapp", recipient.phone, subject, body, meta);
+}
+
+function renderEmailTemplate(message) {
+  const brand = process.env.EMAIL_BRAND_NAME || "StayWise PG";
+  const accent = process.env.EMAIL_BRAND_COLOR || "#0f766e";
+  const safeBody = String(message.body || "").replace(/[<>&]/g, char => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[char]));
+  return `<!doctype html>
+<html>
+  <body style="margin:0;background:#f4f7fb;font-family:Arial,sans-serif;color:#111827">
+    <div style="max-width:640px;margin:0 auto;padding:24px">
+      <div style="background:${accent};color:white;padding:18px 22px;border-radius:8px 8px 0 0">
+        <h1 style="font-size:20px;margin:0">${brand}</h1>
+      </div>
+      <div style="background:white;border:1px solid #e5e7eb;border-top:0;padding:22px;border-radius:0 0 8px 8px">
+        <h2 style="font-size:18px;margin:0 0 14px">${message.subject}</h2>
+        <p style="font-size:15px;line-height:1.6;white-space:pre-line;margin:0">${safeBody}</p>
+        <p style="font-size:12px;color:#667085;margin:22px 0 0">This message was sent by ${brand}. Please contact your property admin for any correction.</p>
+      </div>
+    </div>
+  </body>
+</html>`;
 }
 
 function hasSmtpConfig() {
@@ -247,7 +392,8 @@ async function deliverOutbox(limit = 25) {
           from: process.env.SMTP_FROM || process.env.SMTP_USER,
           to: message.to,
           subject: message.subject,
-          text: message.body
+          text: message.body,
+          html: renderEmailTemplate(message)
         });
         const previewUrl = nodemailer.getTestMessageUrl(info);
         if (previewUrl) message.previewUrl = previewUrl;
@@ -267,6 +413,44 @@ async function deliverOutbox(limit = 25) {
   }
   if (queued.length) await writeDb(db);
   return { processed: queued.length, sent };
+}
+
+async function reportError(error, context = {}) {
+  const payload = {
+    message: error?.message || String(error),
+    stack: isProduction ? "" : error?.stack || "",
+    context,
+    at: new Date().toISOString(),
+    service: "staywise-pg"
+  };
+  try {
+    if (process.env.SENTRY_DSN) {
+      Sentry.withScope(scope => {
+        Object.entries(context || {}).forEach(([key, value]) => scope.setExtra(key, value));
+        Sentry.captureException(error);
+      });
+    }
+    if (process.env.ERROR_WEBHOOK_URL) {
+      await fetch(process.env.ERROR_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(process.env.ERROR_WEBHOOK_TOKEN ? { Authorization: `Bearer ${process.env.ERROR_WEBHOOK_TOKEN}` } : {})
+        },
+        body: JSON.stringify(payload)
+      });
+    }
+    if (process.env.LOGTAIL_SOURCE_TOKEN) {
+      await fetch("https://in.logtail.com/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.LOGTAIL_SOURCE_TOKEN}`
+        },
+        body: JSON.stringify(payload)
+      });
+    }
+  } catch {}
 }
 
 function send(res, status, body, headers = {}) {
@@ -436,8 +620,18 @@ async function requireAuth(req, res) {
 async function requireAdmin(req, res) {
   const session = await requireAuth(req, res);
   if (!session) return null;
-  if (session.user.role !== "admin") {
+  if (!can(session.user, "*")) {
     send(res, 403, { error: "Admin access required" });
+    return null;
+  }
+  return session;
+}
+
+async function requirePermission(req, res, permission) {
+  const session = await requireAuth(req, res);
+  if (!session) return null;
+  if (!can(session.user, permission)) {
+    send(res, 403, { error: "Permission required: " + permission });
     return null;
   }
   return session;
@@ -452,11 +646,11 @@ function nowStamp() {
 }
 
 function publicUser(user) {
-  return { id: user.id, role: user.role, name: user.name, email: user.email, meta: user.meta, passwordResetRequired: Boolean(user.passwordResetRequired) };
+  return { id: user.id, role: user.role, name: user.name, email: user.email, meta: user.meta, permissions: permissionsFor(user), passwordResetRequired: Boolean(user.passwordResetRequired) };
 }
 
 function tenantScopedDb(db, user) {
-  if (user.role === "admin") {
+  if (can(user, "*")) {
     const { users, errorLogs, sessions, security, outbox, ...safeDb } = db;
     delete safeDb.users;
     delete safeDb.errorLogs;
@@ -465,6 +659,22 @@ function tenantScopedDb(db, user) {
     delete safeDb.outbox;
     safeDb.auditLogs = (safeDb.auditLogs || []).slice(0, 100);
     return safeDb;
+  }
+  if (user.role !== "tenant") {
+    const scoped = {
+      tenants: can(user, "tenants:read") ? db.tenants : [],
+      rooms: can(user, "rooms:read") ? db.rooms : [],
+      payments: can(user, "payments:read") ? db.payments : [],
+      paymentSettings: can(user, "paymentSettings:read") || can(user, "payments:read") ? db.paymentSettings : {},
+      complaints: can(user, "complaints:read") ? db.complaints : [],
+      notices: can(user, "notices:read") ? db.notices : [],
+      services: can(user, "services:read") ? db.services : [],
+      staff: can(user, "staff:read") ? db.staff : [],
+      inventory: can(user, "inventory:read") ? db.inventory : [],
+      expenses: can(user, "expenses:read") ? db.expenses : [],
+      auditLogs: can(user, "audit:read") ? (db.auditLogs || []).slice(0, 100) : []
+    };
+    return scoped;
   }
   const tenant = db.tenants.find(item => item.email === user.email || item.name === user.name);
   if (!tenant) {
@@ -662,7 +872,11 @@ async function handleApi(req, res, url) {
       await writeDb(db);
       return send(res, 429, { error: "Too many login attempts. Try again later." });
     }
-    const user = (db.users || []).find(item => item.email === String(body.email || "").toLowerCase() && item.role === body.role && item.active !== false);
+    const loginRole = String(body.role || "admin");
+    const user = (db.users || []).find(item => {
+      const roleMatches = loginRole === "tenant" ? item.role === "tenant" : item.role !== "tenant";
+      return item.email === String(body.email || "").toLowerCase() && roleMatches && item.active !== false;
+    });
     if (!user || !verifyPassword(body.password || "", user)) {
       audit(db, { email: body.email, role: body.role }, "login_failed", { email: body.email, role: body.role });
       await writeDb(db);
@@ -701,7 +915,7 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname.match(/^\/api\/users\/[^/]+\/reset-password$/) && req.method === "POST") {
-    const session = await requireAdmin(req, res);
+    const session = await requirePermission(req, res, "*");
     if (!session) return;
     const id = decodeURIComponent(url.pathname.split("/")[3]);
     const db = await readDb();
@@ -716,7 +930,7 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname.match(/^\/api\/tenants\/[^/]+\/reset-password$/) && req.method === "POST") {
-    const session = await requireAdmin(req, res);
+    const session = await requirePermission(req, res, "tenants:write");
     if (!session) return;
     const tenantId = decodeURIComponent(url.pathname.split("/")[3]);
     const db = await readDb();
@@ -733,21 +947,21 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname === "/api/admin/audit-logs" && req.method === "GET") {
-    const session = await requireAdmin(req, res);
+    const session = await requirePermission(req, res, "audit:read");
     if (!session) return;
     const db = await readDb();
     return send(res, 200, (db.auditLogs || []).slice(0, 500));
   }
 
   if (url.pathname === "/api/admin/outbox" && req.method === "GET") {
-    const session = await requireAdmin(req, res);
+    const session = await requirePermission(req, res, "outbox:read");
     if (!session) return;
     const db = await readDb();
     return send(res, 200, (db.outbox || []).slice(0, 500).map(item => ({ ...item, body: item.type === "email" ? item.body : String(item.body || "").slice(0, 120) })));
   }
 
   if (url.pathname === "/api/admin/outbox/process" && req.method === "POST") {
-    const session = await requireAdmin(req, res);
+    const session = await requirePermission(req, res, "outbox:write");
     if (!session) return;
     const result = await deliverOutbox();
     const db = await readDb();
@@ -757,18 +971,23 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname === "/api/admin/readiness" && req.method === "GET") {
-    const session = await requireAdmin(req, res);
+    const session = await requirePermission(req, res, "audit:read");
     if (!session) return;
     return send(res, 200, {
       nodeEnv: process.env.NODE_ENV || "development",
       httpsConfigured: publicBaseUrl.startsWith("https://"),
       mongoConfigured: Boolean(process.env.MONGODB_URI),
+      dbMode: process.env.DB_MODE || "app_state",
       paymentWebhookConfigured: Boolean(process.env.PAYMENT_WEBHOOK_SECRET),
       razorpayConfigured: paymentGatewayEnabled(),
       smtpConfigured: hasSmtpConfig(),
       freeTestEmailEnabled: process.env.ALLOW_ETHEREAL_TEST_EMAIL === "true",
       twilioConfigured: hasTwilioConfig(),
       smsWebhookConfigured: Boolean(process.env.SMS_WEBHOOK_URL),
+      monitoringConfigured: Boolean(process.env.SENTRY_DSN || process.env.ERROR_WEBHOOK_URL || process.env.LOGTAIL_SOURCE_TOKEN),
+      sentryConfigured: Boolean(process.env.SENTRY_DSN),
+      cloudinaryConfigured: Boolean(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_UPLOAD_PRESET),
+      s3Configured: Boolean(process.env.S3_BUCKET && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY),
       backupIntervalHours: Number(process.env.BACKUP_INTERVAL_HOURS || 0)
     });
   }
@@ -780,7 +999,7 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname === "/api/admin/backup" && req.method === "GET") {
-    const session = await requireAdmin(req, res);
+    const session = await requirePermission(req, res, "backup:read");
     if (!session) return;
     const db = await readDb();
     audit(db, session.user, "backup_downloaded");
@@ -790,11 +1009,12 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname === "/api/payment-settings" && req.method === "PATCH") {
-    const session = await requireAdmin(req, res);
+    const session = await requirePermission(req, res, "paymentSettings:write");
     if (!session) return;
     const db = await readDb();
     const body = sanitizeValue(await parseBody(req));
     if (body.qrImage && String(body.qrImage).length > 1_200_000) return send(res, 413, { error: "QR image is too large. Use a compressed image or hosted image URL." });
+    if (body.qrImage) body.qrImage = await storeImageIfConfigured(body.qrImage, "payment-qr");
     db.paymentSettings = { ...(db.paymentSettings || {}), ...body };
     audit(db, session.user, "payment_settings_updated");
     await writeDb(db);
@@ -849,7 +1069,7 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname.match(/^\/api\/payments\/[^/]+\/verify$/) && req.method === "PATCH") {
-    const session = await requireAdmin(req, res);
+    const session = await requirePermission(req, res, "payments:verify");
     if (!session) return;
     const id = decodeURIComponent(url.pathname.split("/")[3]);
     const db = await readDb();
@@ -866,7 +1086,7 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname.match(/^\/api\/payments\/[^/]+\/reject$/) && req.method === "PATCH") {
-    const session = await requireAdmin(req, res);
+    const session = await requirePermission(req, res, "payments:verify");
     if (!session) return;
     const id = decodeURIComponent(url.pathname.split("/")[3]);
     const db = await readDb();
@@ -883,7 +1103,7 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname.match(/^\/api\/payments\/[^/]+\/remind$/) && req.method === "POST") {
-    const session = await requireAdmin(req, res);
+    const session = await requirePermission(req, res, "payments:write");
     if (!session) return;
     const id = decodeURIComponent(url.pathname.split("/")[3]);
     const db = await readDb();
@@ -978,7 +1198,7 @@ async function handleApi(req, res, url) {
     return send(res, 201, row);
   }
 
-  const session = await requireAdmin(req, res);
+  const session = await requirePermission(req, res, `${collection}:write`);
   if (!session) return;
   const db = await readDb();
   if (collection === "paymentSettings") return send(res, 405, { error: "Use /api/payment-settings to update payment settings" });
@@ -1082,6 +1302,7 @@ const server = http.createServer(async (req, res) => {
       db.errorLogs = db.errorLogs.slice(0, 500);
       await writeDb(db);
     } catch {}
+    reportError(error, { path: url.pathname, method: req.method }).catch(() => {});
     send(res, 500, { error: isProduction ? "Server error" : (error.message || "Server error") });
   }
 });
@@ -1096,6 +1317,7 @@ const server = http.createServer(async (req, res) => {
     console.log(process.env.MONGODB_URI ? "Storage: MongoDB" : "Storage: local JSON");
   });
 })().catch(error => {
+  reportError(error, { phase: "startup" }).catch(() => {});
   console.error("Startup failed:", error);
   process.exit(1);
 });

@@ -11,6 +11,9 @@ Before public deployment:
 - Optional: set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to enable hosted Razorpay payment links.
 - Optional: set SMTP variables to send queued password/reminder emails automatically.
 - Optional: set Twilio variables and `NOTIFY_CHANNELS=email,sms,whatsapp` for SMS/WhatsApp.
+- Optional: set `SENTRY_DSN`, `ERROR_WEBHOOK_URL`, or `LOGTAIL_SOURCE_TOKEN` for external error monitoring.
+- Optional: set Cloudinary or S3 variables so uploaded QR/images are stored as hosted URLs.
+- Optional: set `DB_MODE=collections` for separate MongoDB collections instead of a single `app_state` document.
 - Free testing: set `ALLOW_ETHEREAL_TEST_EMAIL=true` to send email previews through Ethereal. Use real SMTP before live.
 - Set strong `ADMIN_PASSWORD` and `TENANT_PASSWORD` environment variables.
 - Run behind HTTPS, for example Nginx/Caddy/Render/Railway/Vercel proxy.
