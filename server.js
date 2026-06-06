@@ -136,8 +136,26 @@ function enqueueMessage(db, type, to, subject, body, meta = {}) {
   db.outbox = db.outbox.slice(0, 1000);
 }
 
+function notificationChannels() {
+  return String(process.env.NOTIFY_CHANNELS || "email")
+    .split(",")
+    .map(item => item.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function enqueueNotifications(db, recipient, subject, body, meta = {}) {
+  const channels = notificationChannels();
+  if (channels.includes("email") && recipient.email) enqueueMessage(db, "email", recipient.email, subject, body, meta);
+  if (channels.includes("sms") && recipient.phone) enqueueMessage(db, "sms", recipient.phone, subject, body, meta);
+  if (channels.includes("whatsapp") && recipient.phone) enqueueMessage(db, "whatsapp", recipient.phone, subject, body, meta);
+}
+
 function hasSmtpConfig() {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+}
+
+function hasTwilioConfig() {
+  return Boolean(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && (process.env.TWILIO_MESSAGING_SERVICE_SID || process.env.TWILIO_FROM_SMS || process.env.TWILIO_FROM_WHATSAPP));
 }
 
 async function getMailTransporter() {
@@ -166,6 +184,7 @@ async function getMailTransporter() {
 }
 
 async function sendSmsMessage(message) {
+  if (hasTwilioConfig()) return sendTwilioMessage(message);
   if (!process.env.SMS_WEBHOOK_URL) throw new Error("SMS_WEBHOOK_URL is not configured");
   const response = await fetch(process.env.SMS_WEBHOOK_URL, {
     method: "POST",
@@ -176,6 +195,36 @@ async function sendSmsMessage(message) {
     body: JSON.stringify({ to: message.to, subject: message.subject, body: message.body, meta: message.meta || {} })
   });
   if (!response.ok) throw new Error(`SMS provider returned ${response.status}`);
+}
+
+async function sendTwilioMessage(message) {
+  const isWhatsapp = message.type === "whatsapp";
+  const to = isWhatsapp && !String(message.to).startsWith("whatsapp:") ? `whatsapp:${message.to}` : message.to;
+  const from = isWhatsapp ? process.env.TWILIO_FROM_WHATSAPP : process.env.TWILIO_FROM_SMS;
+  const params = new URLSearchParams({
+    To: to,
+    Body: message.body
+  });
+  if (process.env.TWILIO_MESSAGING_SERVICE_SID) {
+    params.set("MessagingServiceSid", process.env.TWILIO_MESSAGING_SERVICE_SID);
+  } else if (from) {
+    params.set("From", from);
+  } else {
+    throw new Error(`Twilio ${message.type} sender is not configured`);
+  }
+  const auth = Buffer.from(`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`).toString("base64");
+  const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(process.env.TWILIO_ACCOUNT_SID)}/Messages.json`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${auth}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: params
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.message || `Twilio returned ${response.status}`);
+  message.provider = "twilio";
+  message.providerMessageId = data.sid || "";
 }
 
 async function deliverOutbox(limit = 25) {
@@ -660,7 +709,7 @@ async function handleApi(req, res, url) {
     if (!user) return send(res, 404, { error: "User not found" });
     const temporaryPassword = crypto.randomBytes(10).toString("base64url");
     Object.assign(user, hashPassword(temporaryPassword), { passwordResetRequired: true, passwordChangedAt: nowStamp() });
-    enqueueMessage(db, "email", user.email, "StayWise temporary password", `Your temporary password is ${temporaryPassword}. Please change it after login.`, { userId: id });
+    enqueueNotifications(db, { email: user.email }, "StayWise temporary password", `Your temporary password is ${temporaryPassword}. Please change it after login.`, { userId: id });
     audit(db, session.user, "password_reset", { userId: id });
     await writeDb(db);
     return send(res, 200, { user: publicUser(user), temporaryPassword });
@@ -677,7 +726,7 @@ async function handleApi(req, res, url) {
     if (!user) return send(res, 404, { error: "Tenant login user not found" });
     const temporaryPassword = crypto.randomBytes(10).toString("base64url");
     Object.assign(user, hashPassword(temporaryPassword), { passwordResetRequired: true, passwordChangedAt: nowStamp() });
-    enqueueMessage(db, "email", user.email, "StayWise temporary password", `Your temporary password is ${temporaryPassword}. Please change it after login.`, { tenantId });
+    enqueueNotifications(db, { email: user.email, phone: tenant.phone }, "StayWise temporary password", `Your temporary password is ${temporaryPassword}. Please change it after login.`, { tenantId });
     audit(db, session.user, "tenant_password_reset", { tenantId });
     await writeDb(db);
     return send(res, 200, { tenantId, temporaryPassword });
@@ -718,6 +767,7 @@ async function handleApi(req, res, url) {
       razorpayConfigured: paymentGatewayEnabled(),
       smtpConfigured: hasSmtpConfig(),
       freeTestEmailEnabled: process.env.ALLOW_ETHEREAL_TEST_EMAIL === "true",
+      twilioConfigured: hasTwilioConfig(),
       smsWebhookConfigured: Boolean(process.env.SMS_WEBHOOK_URL),
       backupIntervalHours: Number(process.env.BACKUP_INTERVAL_HOURS || 0)
     });
@@ -791,7 +841,7 @@ async function handleApi(req, res, url) {
     const link = await createPaymentLink(payment, tenant);
     payment.gatewayLink = { ...link, createdAt: nowStamp() };
     if (link.checkoutUrl) {
-      enqueueMessage(db, "email", tenant?.email || "", "PG rent payment link", `Pay ${payment.month} rent using this secure link: ${link.checkoutUrl}`, { paymentId: payment.id, provider: link.provider });
+      enqueueNotifications(db, tenant || {}, "PG rent payment link", `Pay ${payment.month} rent using this secure link: ${link.checkoutUrl}`, { paymentId: payment.id, provider: link.provider });
     }
     audit(db, session.user, "payment_gateway_link_created", { paymentId: payment.id, provider: link.provider });
     await writeDb(db);
@@ -843,7 +893,7 @@ async function handleApi(req, res, url) {
     payment.lastReminderAt = nowStamp();
     payment.reminderNote = `Reminder sent for ${payment.month} dues`;
     const tenant = db.tenants.find(item => item.name === payment.tenant);
-    if (tenant?.email) enqueueMessage(db, "email", tenant.email, "PG rent payment reminder", `${payment.month} rent of ${payment.amount} is pending. Due date: ${payment.dueDate || "-"}.`, { paymentId: payment.id });
+    if (tenant?.email || tenant?.phone) enqueueNotifications(db, tenant, "PG rent payment reminder", `${payment.month} rent of ${payment.amount} is pending. Due date: ${payment.dueDate || "-"}.`, { paymentId: payment.id });
     audit(db, session.user, "payment_reminder_sent", { paymentId: payment.id });
     await writeDb(db);
     return send(res, 200, payment);
@@ -960,7 +1010,7 @@ async function handleApi(req, res, url) {
         const tempPassword = crypto.randomBytes(8).toString("hex");
         db.users ||= [];
         db.users.push(seedUser("U" + String(db.users.length + 1).padStart(3, "0"), "tenant", row.name, row.email, tempPassword, `Room ${row.room}`));
-        enqueueMessage(db, "email", row.email, "StayWise tenant portal access", `Your tenant portal temporary password is ${tempPassword}. Please change it after login.`, { tenantId: row.id });
+        enqueueNotifications(db, row, "StayWise tenant portal access", `Your tenant portal temporary password is ${tempPassword}. Please change it after login.`, { tenantId: row.id });
         temporaryPassword = tempPassword;
       }
     }

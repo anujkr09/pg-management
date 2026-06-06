@@ -10,6 +10,7 @@ Before public deployment:
 - Set `PUBLIC_BASE_URL=https://your-domain` before production. Production startup blocks insecure base URLs unless explicitly overridden.
 - Optional: set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to enable hosted Razorpay payment links.
 - Optional: set SMTP variables to send queued password/reminder emails automatically.
+- Optional: set Twilio variables and `NOTIFY_CHANNELS=email,sms,whatsapp` for SMS/WhatsApp.
 - Free testing: set `ALLOW_ETHEREAL_TEST_EMAIL=true` to send email previews through Ethereal. Use real SMTP before live.
 - Set strong `ADMIN_PASSWORD` and `TENANT_PASSWORD` environment variables.
 - Run behind HTTPS, for example Nginx/Caddy/Render/Railway/Vercel proxy.
@@ -27,5 +28,5 @@ Before public deployment:
 Remaining production upgrade:
 
 - Keep regular MongoDB Atlas backups enabled.
-- Connect SMS/WhatsApp provider if you need non-email reminders.
+- Twilio adapter is included for SMS/WhatsApp; MSG91 can still be connected through `SMS_WEBHOOK_URL`.
 - Add Cashfree/PhonePe/Paytm checkout adapters if you do not want Razorpay payment links.

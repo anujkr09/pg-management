@@ -56,3 +56,4 @@ For `npm run smoke`, set `SMOKE_ADMIN_PASSWORD` in your local `.env`.
 - Use UPI QR/manual admin verification for free payments.
 - Add Razorpay keys for hosted payment links.
 - Add SMTP credentials for real email delivery.
+- Add Twilio credentials and set `NOTIFY_CHANNELS=email,sms,whatsapp` for SMS/WhatsApp notifications.
