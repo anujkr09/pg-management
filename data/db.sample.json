@@ -1,0 +1,71 @@
+{
+  "tenants": [
+    {
+      "id": "T001",
+      "name": "Demo Tenant",
+      "phone": "9000000000",
+      "email": "tenant@example.com",
+      "room": "101",
+      "rent": 9500,
+      "status": "active",
+      "join": "01 Jun 2026"
+    }
+  ],
+  "rooms": [
+    {
+      "num": "101",
+      "type": "Single",
+      "floor": "1",
+      "status": "occupied"
+    },
+    {
+      "num": "102",
+      "type": "Double",
+      "floor": "1",
+      "status": "vacant"
+    }
+  ],
+  "payments": [
+    {
+      "id": "P001",
+      "tenant": "Demo Tenant",
+      "room": "101",
+      "amount": 9500,
+      "month": "Jun 2026",
+      "status": "pending",
+      "date": "-",
+      "dueDate": "07 Jun 2026",
+      "invoiceNo": "INV-P001"
+    }
+  ],
+  "paymentSettings": {
+    "businessName": "StayWise PG",
+    "upiId": "staywise@upi",
+    "payeeName": "StayWise PG",
+    "phone": "9000000000",
+    "qrImage": "",
+    "instructions": "Payment ke baad transaction ID submit karein. Admin verification ke baad payment final paid mark hoga."
+  },
+  "complaints": [],
+  "notices": [
+    {
+      "id": "N001",
+      "title": "Welcome",
+      "tag": "Important",
+      "message": "This is sample data. Replace it before production.",
+      "date": "01 Jun 2026"
+    }
+  ],
+  "services": [],
+  "staff": [],
+  "inventory": [],
+  "expenses": [],
+  "auditLogs": [],
+  "errorLogs": [],
+  "outbox": [],
+  "sessions": [],
+  "security": {
+    "loginAttempts": {}
+  },
+  "users": []
+}

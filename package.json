@@ -1,0 +1,26 @@
+{
+  "name": "staywise-pg-management",
+  "version": "1.0.0",
+  "description": "Dynamic PG hostel management system with Node backend and browser frontend.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "check": "node --check server.js && node scripts/check-frontend.js",
+    "smoke": "node scripts/smoke-test.js"
+  },
+  "keywords": [
+    "pg",
+    "hostel",
+    "management",
+    "backend",
+    "frontend"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "mongodb": "^7.2.0",
+    "nodemailer": "^8.0.10"
+  }
+}
