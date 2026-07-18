@@ -1,166 +1,2366 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StayWise PG Management System</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lucide@latest"></script>
-<style>
-:root{--bg:#f5f7fb;--panel:#fff;--ink:#152033;--muted:#667085;--line:#dce3ec;--soft:#eef3f8;--brand:#0f766e;--blue:#2563eb;--red:#c2410c;--green:#15803d;--amber:#b7791f;--shadow:0 18px 48px rgba(20,32,51,.09)}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
-.login{min-height:100vh;display:grid;grid-template-columns:minmax(360px,500px) 1fr;background:#0d1b2a}.login-panel{background:white;padding:42px;display:flex;flex-direction:column;justify-content:center}.brand{display:flex;gap:12px;align-items:center;margin-bottom:34px}.logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--blue));display:grid;place-items:center;color:white}.brand strong{display:block;font-size:22px}.brand span{display:block;color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.login h1{font-size:32px;line-height:1.1;margin:0 0 10px}.login p{color:var(--muted);line-height:1.65;margin:0 0 22px}.roles{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--soft);padding:5px;border-radius:8px;margin-bottom:18px}.roles button{border:0;background:transparent;border-radius:6px;padding:10px;font-weight:800;color:var(--muted)}.roles button.active{background:white;color:var(--ink);box-shadow:0 6px 18px rgba(20,32,51,.08)}.field{display:grid;gap:7px;margin-bottom:14px}.field label{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:8px;padding:12px;background:white;outline:0}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(15,118,110,.12)}
-.btn{border:0;border-radius:8px;padding:11px 14px;font-weight:800;display:inline-flex;align-items:center;gap:8px;justify-content:center}.primary{background:var(--brand);color:white}.secondary{background:#e8f1ff;color:#1d4ed8}.ghost{background:var(--soft);color:var(--ink)}.danger{background:#fff1ed;color:var(--red)}.login-actions{display:flex;gap:10px}.login-actions button{flex:1}.hero{display:flex;align-items:flex-end;padding:42px;background:linear-gradient(90deg,rgba(13,27,42,.75),rgba(13,27,42,.18)),url("https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1500&q=80") center/cover;color:white}.hero h2{max-width:680px;font-size:48px;line-height:1.02;margin:0 0 16px}.hero p{max-width:620px;color:rgba(255,255,255,.82);font-size:17px}.hero-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:26px}.hero-metrics div{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(12px);border-radius:8px;padding:16px}.hero-metrics b{font-size:24px;display:block}.hero-metrics span{font-size:12px;color:rgba(255,255,255,.76)}
-.app{display:grid;grid-template-columns:276px 1fr;min-height:100vh}.sidebar{height:100vh;position:sticky;top:0;background:#111827;color:white;padding:18px;display:flex;flex-direction:column;gap:18px}.side-brand{display:flex;gap:12px;align-items:center;padding:6px}.side-brand span{color:#aab3c2;font-size:12px}.nav{display:flex;flex-direction:column;gap:4px;overflow:auto}.nav button{border:0;background:transparent;color:#aab3c2;border-radius:8px;padding:11px 12px;text-align:left;display:flex;gap:11px;align-items:center;font-weight:700}.nav button.active,.nav button:hover{background:#1f2937;color:white}.side-user{margin-top:auto;border-top:1px solid #2c3646;padding-top:14px}.user{display:flex;gap:10px;align-items:center;background:#1f2937;border-radius:8px;padding:10px}.avatar{width:38px;height:38px;border-radius:8px;background:#dbeafe;color:#1d4ed8;display:grid;place-items:center;font-weight:900}.user b{display:block}.user span{color:#aab3c2;font-size:12px}.main{min-width:0}.topbar{height:72px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px}.topbar h1{font-size:22px;margin:0}.topbar small{display:block;margin-top:3px;color:var(--muted)}.top-actions,.row-actions{display:flex;gap:10px;align-items:center}.icon-btn{width:38px;height:38px;border:1px solid var(--line);border-radius:8px;background:white;display:grid;place-items:center}.search{position:relative}.search i{position:absolute;left:12px;top:11px;color:var(--muted)}.search input{border:1px solid var(--line);border-radius:8px;padding:10px 12px 10px 38px;width:270px;outline:0}.content{padding:26px;display:grid;gap:20px}.grid{display:grid;gap:16px}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.card{background:white;border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow)}.card-hd{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.card-hd h2{font-size:16px;margin:0}.card-body{padding:18px}.stat{padding:18px}.stat .stat-icon{width:42px;height:42px;border-radius:8px;display:grid;place-items:center;margin-bottom:16px}.stat b{font-size:28px;display:block}.stat span{font-size:13px;color:var(--muted);font-weight:700}.teal{background:#dcfdfa;color:#0f766e}.blue{background:#dbeafe;color:#1d4ed8}.green{background:#dcfce7;color:#15803d}.orange{background:#fff7ed;color:#b7791f}.purple{background:#f3e8ff;color:#6d28d9}
-table{width:100%;border-collapse:collapse}th,td{padding:13px 14px;text-align:left;border-bottom:1px solid var(--line);font-size:14px}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}tr:last-child td{border-bottom:0}.badge{display:inline-flex;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;text-transform:capitalize}.paid,.occupied,.resolved,.active,.completed,.ok{background:#dcfce7;color:#15803d}.pending,.maintenance{background:#fff7ed;color:#b7791f}.verification_pending{background:#eef2ff;color:#3730a3}.overdue,.open{background:#fff1ed;color:#c2410c}.vacant,.low{background:#dbeafe;color:#1d4ed8}.empty{padding:34px;text-align:center;color:var(--muted)}.quick{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.quick button{background:white;border:1px solid var(--line);border-radius:8px;padding:16px;text-align:left;font-weight:800;box-shadow:var(--shadow)}.quick i{display:block;margin-bottom:12px;color:var(--brand)}.notice{padding:14px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;background:#f9fbfd}.notice b{display:block;margin-bottom:5px}.notice p{margin:0;color:var(--muted);line-height:1.55}.notice small{color:var(--muted);font-weight:700}.payment-box{display:grid;grid-template-columns:180px 1fr;gap:18px;align-items:start}.qr{width:180px;height:180px;border:1px solid var(--line);border-radius:8px;background:white;object-fit:contain;padding:8px}.pay-options{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 14px}.pay-options a{text-decoration:none}.invoice-note{background:#f9fbfd;border:1px dashed var(--line);border-radius:8px;padding:12px;color:var(--muted);line-height:1.55}.reminder{border-left:4px solid var(--amber);background:#fffbeb}.chart{height:230px;display:flex;align-items:end;gap:12px}.bar{flex:1;display:flex;flex-direction:column;gap:8px;align-items:center}.bar span{width:100%;min-height:28px;border-radius:8px 8px 0 0;background:linear-gradient(180deg,var(--blue),var(--brand))}.bar small{color:var(--muted)}.profile{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center}.big-av{width:76px;height:76px;border-radius:8px;background:#dbeafe;color:#1d4ed8;display:grid;place-items:center;font-size:30px;font-weight:900}.profile h2{margin:0 0 6px}.profile p{margin:0;color:var(--muted)}
-.modal-wrap{position:fixed;inset:0;background:rgba(15,23,42,.42);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}.modal-wrap.open{display:flex}.modal{width:min(560px,100%);background:white;border-radius:8px;box-shadow:0 24px 80px rgba(0,0,0,.22);overflow:hidden}.modal-hd{padding:18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modal-hd h2{font-size:18px;margin:0}.modal-body{padding:18px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;padding:16px 18px;border-top:1px solid var(--line);background:#f9fbfd}.toast{position:fixed;right:24px;bottom:24px;background:#111827;color:white;border-radius:8px;padding:13px 16px;font-weight:800;display:none;box-shadow:0 18px 40px rgba(0,0,0,.18);z-index:80}.toast.show{display:block}.mobile-menu{display:none}
-@media(max-width:1020px){.login{grid-template-columns:1fr}.hero{display:none}.app{grid-template-columns:1fr}.sidebar{position:fixed;left:-286px;z-index:30;transition:.2s}.sidebar.open{left:0}.mobile-menu{display:grid}.content{padding:16px}.topbar{padding:0 16px}.g4,.g3,.g2,.quick,.pay-options{grid-template-columns:1fr}.payment-box{grid-template-columns:1fr}.search input{width:180px}}@media(max-width:620px){.login-panel{padding:24px}.top-actions .search{display:none}.profile{grid-template-columns:1fr}.hero-metrics{grid-template-columns:1fr}th:nth-child(4),td:nth-child(4){display:none}}
-html{scroll-behavior:smooth}body{overflow-x:hidden}.btn,.icon-btn,.nav button,.quick button{min-height:40px}.btn{white-space:normal;text-align:center;line-height:1.2}.row-actions{flex-wrap:wrap}.card,.notice,.invoice-note,.field input,.field textarea,.field select{min-width:0}.card-hd h2,.topbar h1,.notice b,.notice p,td,.value{overflow-wrap:anywhere}.card-body{min-width:0}.card-body[style]{max-width:100%}
-@media(max-width:760px){
-  .login{min-height:100svh}.login-panel{min-height:100svh;padding:22px}.login h1{font-size:26px}.login-actions{flex-direction:column}
-  .topbar{height:auto;min-height:66px;align-items:flex-start;gap:12px;padding:12px 14px}.topbar h1{font-size:18px}.topbar small{font-size:12px}.top-actions{margin-left:auto}.content{padding:14px;gap:14px}
-  .sidebar{width:min(286px,86vw);height:100svh;box-shadow:18px 0 44px rgba(15,23,42,.25)}.sidebar.open{left:0}.nav button{padding:12px}
-  .card-hd{align-items:flex-start;flex-direction:column;padding:14px}.card-hd .row-actions,.card-hd .btn{width:100%}.card-body{padding:14px}.stat{padding:14px}.stat b{font-size:24px}
-  .quick button{display:flex;align-items:center;gap:10px}.quick i{margin:0}.payment-box{gap:14px}.qr{width:min(220px,100%);height:auto;aspect-ratio:1;margin:auto}.pay-options{grid-template-columns:1fr 1fr}.pay-options .btn{width:100%}
-  .modal-wrap{align-items:flex-end;padding:0}.modal{width:100%;max-height:92svh;border-radius:8px 8px 0 0;display:flex;flex-direction:column}.modal-body{overflow:auto;padding:14px}.modal-hd,.modal-actions{padding:14px}.modal-actions{flex-direction:column}.modal-actions .btn{width:100%}
-  table,thead,tbody,tr,th,td{display:block}thead{display:none}table{border-collapse:separate;border-spacing:0}tbody{display:grid;gap:12px}tr{border:1px solid var(--line);border-radius:8px;background:white;overflow:hidden}td{display:grid;grid-template-columns:minmax(104px,36%) 1fr;gap:10px;align-items:start;padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}td:last-child{border-bottom:0}td::before{content:attr(data-label);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}td .btn{width:100%;margin:3px 0}.badge{width:max-content;max-width:100%;white-space:normal}
-}
-@media(max-width:420px){
-  .login-panel{padding:18px}.brand strong{font-size:19px}.roles{grid-template-columns:1fr}.topbar{padding:10px 12px}.icon-btn{width:36px;height:36px}.pay-options{grid-template-columns:1fr}td{grid-template-columns:1fr;gap:4px}.toast{right:12px;left:12px;bottom:12px;text-align:center}.profile{gap:12px}.big-av{width:64px;height:64px;font-size:24px}
-}
-@media(max-width:620px){
-  .login{display:block;width:100%;overflow:hidden}.login-panel{width:100%;max-width:100%;padding:20px;overflow:hidden}.login h1{font-size:25px;line-height:1.16}.login h1,.login p,.brand,.field,.roles,.login-actions{max-width:100%;overflow-wrap:anywhere}.roles{grid-template-columns:1fr}.field input,.field select,.field textarea{width:100%;min-width:0}.login-actions .btn{width:100%}
-}
-</style>
-</head>
-<body>
-<section class="login" id="loginScreen">
-  <div class="login-panel">
-    <div class="brand"><div class="logo"><i data-lucide="building-2"></i></div><div><strong>StayWise PG</strong><span>Hostel Management</span></div></div>
-    <h1>PG rent, rooms aur tenants ek jagah.</h1>
-    <p>Daily rent collection, room occupancy, complaints, staff aur tenant requests ko simple dashboard se manage karein.</p>
-    <div class="roles"><button class="active" id="adminRole" onclick="setRole('admin')">Admin</button><button id="tenantRole" onclick="setRole('tenant')">Tenant</button></div>
-    <div class="field"><label>Email</label><input id="email" type="email" value="admin@staywise.in"></div>
-    <div class="field"><label>Password</label><input id="password" type="password" placeholder="Enter password"></div>
-    <div class="login-actions"><button class="btn primary" id="loginBtn" onclick="login()"><i data-lucide="log-in"></i>Login</button><button class="btn secondary" onclick="toast('Admin se login details lein')"><i data-lucide="help-circle"></i>Need Help</button></div>
-    <div id="loginStatus" style="margin-top:12px;color:#667085;font-size:13px;line-height:1.5;min-height:20px"></div>
-  </div>
-  <div class="hero"><div><h2>Rooms, rent, complaints aur reports ka smart control.</h2><p>Owner, staff aur tenants ke liye clean portal, jahan payment follow-up se lekar daily requests tak sab track hota hai.</p><div class="hero-metrics"><div><b>Rooms</b><span>Occupancy tracking</span></div><div><b>Rent</b><span>Dues and receipts</span></div><div><b>Tenants</b><span>Self-service portal</span></div></div></div></div>
-</section>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayWise PG Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --panel: #fff;
+        --ink: #152033;
+        --muted: #667085;
+        --line: #dce3ec;
+        --soft: #eef3f8;
+        --brand: #0f766e;
+        --blue: #2563eb;
+        --red: #c2410c;
+        --green: #15803d;
+        --amber: #b7791f;
+        --shadow: 0 18px 48px rgba(20, 32, 51, 0.09);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          system-ui,
+          Segoe UI,
+          sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .login {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: minmax(360px, 500px) 1fr;
+        background: #0d1b2a;
+      }
+      .login-panel {
+        background: white;
+        padding: 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 34px;
+      }
+      .logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--brand), var(--blue));
+        display: grid;
+        place-items: center;
+        color: white;
+      }
+      .brand strong {
+        display: block;
+        font-size: 22px;
+      }
+      .brand span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .login h1 {
+        font-size: 32px;
+        line-height: 1.1;
+        margin: 0 0 10px;
+      }
+      .login p {
+        color: var(--muted);
+        line-height: 1.65;
+        margin: 0 0 22px;
+      }
+      .roles {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        background: var(--soft);
+        padding: 5px;
+        border-radius: 8px;
+        margin-bottom: 18px;
+      }
+      .roles button {
+        border: 0;
+        background: transparent;
+        border-radius: 6px;
+        padding: 10px;
+        font-weight: 800;
+        color: var(--muted);
+      }
+      .roles button.active {
+        background: white;
+        color: var(--ink);
+        box-shadow: 0 6px 18px rgba(20, 32, 51, 0.08);
+      }
+      .field {
+        display: grid;
+        gap: 7px;
+        margin-bottom: 14px;
+      }
+      .field label {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px;
+        background: white;
+        outline: 0;
+      }
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+      }
+      .btn {
+        border: 0;
+        border-radius: 8px;
+        padding: 11px 14px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+      }
+      .primary {
+        background: var(--brand);
+        color: white;
+      }
+      .secondary {
+        background: #e8f1ff;
+        color: #1d4ed8;
+      }
+      .ghost {
+        background: var(--soft);
+        color: var(--ink);
+      }
+      .danger {
+        background: #fff1ed;
+        color: var(--red);
+      }
+      .login-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .login-actions button {
+        flex: 1;
+      }
+      .auth-switch {
+        margin-top: 14px;
+      }
+      .auth-switch button {
+        width: 100%;
+        min-height: 46px;
+        border: 1px solid rgba(15, 118, 110, 0.28);
+        border-radius: 8px;
+        background: #f0fdfa;
+        color: var(--brand);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 900;
+        padding: 12px 14px;
+      }
+      .auth-switch small {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+      .hero {
+        display: flex;
+        align-items: flex-end;
+        padding: 42px;
+        background:
+          linear-gradient(
+            90deg,
+            rgba(13, 27, 42, 0.75),
+            rgba(13, 27, 42, 0.18)
+          ),
+          url("https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1500&q=80")
+            center/cover;
+        color: white;
+      }
+      .hero h2 {
+        max-width: 680px;
+        font-size: 48px;
+        line-height: 1.02;
+        margin: 0 0 16px;
+      }
+      .hero p {
+        max-width: 620px;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 17px;
+      }
+      .hero-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 26px;
+      }
+      .hero-metrics div {
+        background: rgba(255, 255, 255, 0.13);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(12px);
+        border-radius: 8px;
+        padding: 16px;
+      }
+      .hero-metrics b {
+        font-size: 24px;
+        display: block;
+      }
+      .hero-metrics span {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.76);
+      }
+      .app {
+        display: grid;
+        grid-template-columns: 276px 1fr;
+        min-height: 100vh;
+      }
+      .sidebar {
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        background: #111827;
+        color: white;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .side-brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 6px;
+      }
+      .side-brand span {
+        color: #aab3c2;
+        font-size: 12px;
+      }
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        overflow: auto;
+      }
+      .nav button {
+        border: 0;
+        background: transparent;
+        color: #aab3c2;
+        border-radius: 8px;
+        padding: 11px 12px;
+        text-align: left;
+        display: flex;
+        gap: 11px;
+        align-items: center;
+        font-weight: 700;
+      }
+      .nav button.active,
+      .nav button:hover {
+        background: #1f2937;
+        color: white;
+      }
+      .side-user {
+        margin-top: auto;
+        border-top: 1px solid #2c3646;
+        padding-top: 14px;
+      }
+      .user {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        background: #1f2937;
+        border-radius: 8px;
+        padding: 10px;
+      }
+      .avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        background: #dbeafe;
+        color: #1d4ed8;
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+      }
+      .user b {
+        display: block;
+      }
+      .user span {
+        color: #aab3c2;
+        font-size: 12px;
+      }
+      .main {
+        min-width: 0;
+      }
+      .topbar {
+        height: 72px;
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(12px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 28px;
+      }
+      .topbar h1 {
+        font-size: 22px;
+        margin: 0;
+      }
+      .topbar small {
+        display: block;
+        margin-top: 3px;
+        color: var(--muted);
+      }
+      .top-actions,
+      .row-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+        display: grid;
+        place-items: center;
+      }
+      .search {
+        position: relative;
+      }
+      .search i {
+        position: absolute;
+        left: 12px;
+        top: 11px;
+        color: var(--muted);
+      }
+      .search input {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px 12px 10px 38px;
+        width: 270px;
+        outline: 0;
+      }
+      .content {
+        padding: 26px;
+        display: grid;
+        gap: 20px;
+      }
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+      .g4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .g3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .g2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .card {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
+      .card-hd {
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .card-hd h2 {
+        font-size: 16px;
+        margin: 0;
+      }
+      .card-body {
+        padding: 18px;
+      }
+      .stat {
+        padding: 18px;
+      }
+      .stat .stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 16px;
+      }
+      .stat b {
+        font-size: 28px;
+        display: block;
+      }
+      .stat span {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .teal {
+        background: #dcfdfa;
+        color: #0f766e;
+      }
+      .blue {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+      .green {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .orange {
+        background: #fff7ed;
+        color: #b7791f;
+      }
+      .purple {
+        background: #f3e8ff;
+        color: #6d28d9;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 13px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+        font-size: 14px;
+      }
+      th {
+        font-size: 12px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      .badge {
+        display: inline-flex;
+        border-radius: 999px;
+        padding: 5px 9px;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: capitalize;
+      }
+      .paid,
+      .occupied,
+      .resolved,
+      .active,
+      .completed,
+      .ok {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .pending,
+      .maintenance {
+        background: #fff7ed;
+        color: #b7791f;
+      }
+      .verification_pending {
+        background: #eef2ff;
+        color: #3730a3;
+      }
+      .overdue,
+      .open {
+        background: #fff1ed;
+        color: #c2410c;
+      }
+      .vacant,
+      .low {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+      .empty {
+        padding: 34px;
+        text-align: center;
+        color: var(--muted);
+      }
+      .quick {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+      }
+      .quick button {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 16px;
+        text-align: left;
+        font-weight: 800;
+        box-shadow: var(--shadow);
+      }
+      .quick i {
+        display: block;
+        margin-bottom: 12px;
+        color: var(--brand);
+      }
+      .notice {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        background: #f9fbfd;
+      }
+      .notice b {
+        display: block;
+        margin-bottom: 5px;
+      }
+      .notice p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+      .notice small {
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .payment-box {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 18px;
+        align-items: start;
+      }
+      .qr {
+        width: 180px;
+        height: 180px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+        object-fit: contain;
+        padding: 8px;
+      }
+      .pay-options {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin: 10px 0 14px;
+      }
+      .pay-options a {
+        text-decoration: none;
+      }
+      .invoice-note {
+        background: #f9fbfd;
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        padding: 12px;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+      .reminder {
+        border-left: 4px solid var(--amber);
+        background: #fffbeb;
+      }
+      .chart {
+        height: 230px;
+        display: flex;
+        align-items: end;
+        gap: 12px;
+      }
+      .bar {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+      }
+      .bar span {
+        width: 100%;
+        min-height: 28px;
+        border-radius: 8px 8px 0 0;
+        background: linear-gradient(180deg, var(--blue), var(--brand));
+      }
+      .bar small {
+        color: var(--muted);
+      }
+      .profile {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 18px;
+        align-items: center;
+      }
+      .big-av {
+        width: 76px;
+        height: 76px;
+        border-radius: 8px;
+        background: #dbeafe;
+        color: #1d4ed8;
+        display: grid;
+        place-items: center;
+        font-size: 30px;
+        font-weight: 900;
+      }
+      .profile h2 {
+        margin: 0 0 6px;
+      }
+      .profile p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .modal-wrap {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.42);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        padding: 20px;
+      }
+      .modal-wrap.open {
+        display: flex;
+      }
+      .modal {
+        width: min(560px, 100%);
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+        overflow: hidden;
+      }
+      .modal-hd {
+        padding: 18px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-hd h2 {
+        font-size: 18px;
+        margin: 0;
+      }
+      .modal-body {
+        padding: 18px;
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 18px;
+        border-top: 1px solid var(--line);
+        background: #f9fbfd;
+      }
+      .toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        background: #111827;
+        color: white;
+        border-radius: 8px;
+        padding: 13px 16px;
+        font-weight: 800;
+        display: none;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+        z-index: 80;
+      }
+      .toast.show {
+        display: block;
+      }
+      .mobile-menu {
+        display: none;
+      }
+      @media (max-width: 1020px) {
+        .login {
+          grid-template-columns: 1fr;
+        }
+        .hero {
+          display: none;
+        }
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          position: fixed;
+          left: -286px;
+          z-index: 30;
+          transition: 0.2s;
+        }
+        .sidebar.open {
+          left: 0;
+        }
+        .mobile-menu {
+          display: grid;
+        }
+        .content {
+          padding: 16px;
+        }
+        .topbar {
+          padding: 0 16px;
+        }
+        .g4,
+        .g3,
+        .g2,
+        .quick,
+        .pay-options {
+          grid-template-columns: 1fr;
+        }
+        .payment-box {
+          grid-template-columns: 1fr;
+        }
+        .search input {
+          width: 180px;
+        }
+      }
+      @media (max-width: 620px) {
+        .login-panel {
+          padding: 24px;
+        }
+        .top-actions .search {
+          display: none;
+        }
+        .profile {
+          grid-template-columns: 1fr;
+        }
+        .hero-metrics {
+          grid-template-columns: 1fr;
+        }
+        th:nth-child(4),
+        td:nth-child(4) {
+          display: none;
+        }
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        overflow-x: hidden;
+      }
+      .btn,
+      .icon-btn,
+      .nav button,
+      .quick button {
+        min-height: 40px;
+      }
+      .btn {
+        white-space: normal;
+        text-align: center;
+        line-height: 1.2;
+      }
+      .row-actions {
+        flex-wrap: wrap;
+      }
+      .card,
+      .notice,
+      .invoice-note,
+      .field input,
+      .field textarea,
+      .field select {
+        min-width: 0;
+      }
+      .card-hd h2,
+      .topbar h1,
+      .notice b,
+      .notice p,
+      td,
+      .value {
+        overflow-wrap: anywhere;
+      }
+      .card-body {
+        min-width: 0;
+      }
+      .card-body[style] {
+        max-width: 100%;
+      }
+      @media (max-width: 760px) {
+        .login {
+          min-height: 100svh;
+        }
+        .login-panel {
+          min-height: 100svh;
+          padding: 22px;
+        }
+        .login h1 {
+          font-size: 26px;
+        }
+        .login-actions {
+          flex-direction: column;
+        }
+        .topbar {
+          height: auto;
+          min-height: 66px;
+          align-items: flex-start;
+          gap: 12px;
+          padding: 12px 14px;
+        }
+        .topbar h1 {
+          font-size: 18px;
+        }
+        .topbar small {
+          font-size: 12px;
+        }
+        .top-actions {
+          margin-left: auto;
+        }
+        .content {
+          padding: 14px;
+          gap: 14px;
+        }
+        .sidebar {
+          width: min(286px, 86vw);
+          height: 100svh;
+          box-shadow: 18px 0 44px rgba(15, 23, 42, 0.25);
+        }
+        .sidebar.open {
+          left: 0;
+        }
+        .nav button {
+          padding: 12px;
+        }
+        .card-hd {
+          align-items: flex-start;
+          flex-direction: column;
+          padding: 14px;
+        }
+        .card-hd .row-actions,
+        .card-hd .btn {
+          width: 100%;
+        }
+        .card-body {
+          padding: 14px;
+        }
+        .stat {
+          padding: 14px;
+        }
+        .stat b {
+          font-size: 24px;
+        }
+        .quick button {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .quick i {
+          margin: 0;
+        }
+        .payment-box {
+          gap: 14px;
+        }
+        .qr {
+          width: min(220px, 100%);
+          height: auto;
+          aspect-ratio: 1;
+          margin: auto;
+        }
+        .pay-options {
+          grid-template-columns: 1fr 1fr;
+        }
+        .pay-options .btn {
+          width: 100%;
+        }
+        .modal-wrap {
+          align-items: flex-end;
+          padding: 0;
+        }
+        .modal {
+          width: 100%;
+          max-height: 92svh;
+          border-radius: 8px 8px 0 0;
+          display: flex;
+          flex-direction: column;
+        }
+        .modal-body {
+          overflow: auto;
+          padding: 14px;
+        }
+        .modal-hd,
+        .modal-actions {
+          padding: 14px;
+        }
+        .modal-actions {
+          flex-direction: column;
+        }
+        .modal-actions .btn {
+          width: 100%;
+        }
+        table,
+        thead,
+        tbody,
+        tr,
+        th,
+        td {
+          display: block;
+        }
+        thead {
+          display: none;
+        }
+        table {
+          border-collapse: separate;
+          border-spacing: 0;
+        }
+        tbody {
+          display: grid;
+          gap: 12px;
+        }
+        tr {
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: white;
+          overflow: hidden;
+        }
+        td {
+          display: grid;
+          grid-template-columns: minmax(104px, 36%) 1fr;
+          gap: 10px;
+          align-items: start;
+          padding: 10px 12px;
+          border-bottom: 1px solid var(--line);
+          font-size: 13px;
+        }
+        td:last-child {
+          border-bottom: 0;
+        }
+        td::before {
+          content: attr(data-label);
+          font-size: 11px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: var(--muted);
+        }
+        td .btn {
+          width: 100%;
+          margin: 3px 0;
+        }
+        .badge {
+          width: max-content;
+          max-width: 100%;
+          white-space: normal;
+        }
+      }
+      @media (max-width: 420px) {
+        .login-panel {
+          padding: 18px;
+        }
+        .brand strong {
+          font-size: 19px;
+        }
+        .roles {
+          grid-template-columns: 1fr;
+        }
+        .topbar {
+          padding: 10px 12px;
+        }
+        .icon-btn {
+          width: 36px;
+          height: 36px;
+        }
+        .pay-options {
+          grid-template-columns: 1fr;
+        }
+        td {
+          grid-template-columns: 1fr;
+          gap: 4px;
+        }
+        .toast {
+          right: 12px;
+          left: 12px;
+          bottom: 12px;
+          text-align: center;
+        }
+        .profile {
+          gap: 12px;
+        }
+        .big-av {
+          width: 64px;
+          height: 64px;
+          font-size: 24px;
+        }
+      }
+      @media (max-width: 620px) {
+        .login {
+          display: block;
+          width: 100%;
+          overflow: hidden;
+        }
+        .login-panel {
+          width: 100%;
+          max-width: 100%;
+          padding: 20px;
+          overflow: hidden;
+        }
+        .login h1 {
+          font-size: 25px;
+          line-height: 1.16;
+        }
+        .login h1,
+        .login p,
+        .brand,
+        .field,
+        .roles,
+        .login-actions {
+          max-width: 100%;
+          overflow-wrap: anywhere;
+        }
+        .roles {
+          grid-template-columns: 1fr;
+        }
+        .field input,
+        .field select,
+        .field textarea {
+          width: 100%;
+          min-width: 0;
+        }
+        .login-actions .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="login" id="loginScreen">
+      <div class="login-panel">
+        <div class="brand">
+          <div class="logo"><i data-lucide="building-2"></i></div>
+          <div><strong>StayWise PG</strong><span>Hostel Management</span></div>
+        </div>
+        <h1>PG rent, rooms aur tenants ek jagah.</h1>
+        <p>
+          Daily rent collection, room occupancy, complaints, staff aur tenant
+          requests ko simple dashboard se manage karein.
+        </p>
+        <div class="roles">
+          <button class="active" id="adminRole" onclick="setRole('admin')">
+            Admin</button
+          ><button id="tenantRole" onclick="setRole('tenant')">Tenant</button>
+        </div>
+        <div class="field">
+          <label>Email</label
+          ><input id="email" type="email" value="admin@staywise.in" />
+        </div>
+        <div class="field">
+          <label>Password</label
+          ><input id="password" type="password" placeholder="Enter password" />
+        </div>
+        <div class="login-actions">
+          <button class="btn primary" id="loginBtn" onclick="login()">
+            <i data-lucide="log-in"></i>Login</button
+          ><button
+            class="btn secondary"
+            onclick="toast('Admin se login details lein')"
+          >
+            <i data-lucide="help-circle"></i>Need Help
+          </button>
+        </div>
+        <div class="auth-switch">
+          <button onclick="openRegister()">
+            <i data-lucide="user-plus"></i>New Tenant Registration
+          </button>
+          <small
+            >Pehli baar PG join kar rahe hain to yahan name, email, phone aur
+            Aadhaar proof submit karein.</small
+          >
+        </div>
+        <div
+          id="loginStatus"
+          style="
+            margin-top: 12px;
+            color: #667085;
+            font-size: 13px;
+            line-height: 1.5;
+            min-height: 20px;
+          "
+        ></div>
+      </div>
+      <div class="hero">
+        <div>
+          <h2>Rooms, rent, complaints aur reports ka smart control.</h2>
+          <p>
+            Owner, staff aur tenants ke liye clean portal, jahan payment
+            follow-up se lekar daily requests tak sab track hota hai.
+          </p>
+          <div class="hero-metrics">
+            <div><b>Rooms</b><span>Occupancy tracking</span></div>
+            <div><b>Rent</b><span>Dues and receipts</span></div>
+            <div><b>Tenants</b><span>Self-service portal</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<section class="app hidden" id="appScreen">
-  <aside class="sidebar" id="sidebar">
-    <div class="side-brand"><div class="logo"><i data-lucide="building-2"></i></div><div><strong>StayWise</strong><span id="roleLabel">Admin Console</span></div></div>
-    <nav class="nav" id="nav"></nav>
-    <div class="side-user"><div class="user"><div class="avatar" id="avatar">A</div><div><b id="userName">Admin</b><span id="userMeta">Property Manager</span></div></div><button class="btn secondary" style="width:100%;margin-top:10px" onclick="openChangePassword()"><i data-lucide="key-round"></i>Change Password</button><button class="btn ghost" style="width:100%;margin-top:10px" onclick="logout()"><i data-lucide="log-out"></i>Logout</button></div>
-  </aside>
-  <main class="main">
-    <header class="topbar">
-      <div class="row-actions"><button class="icon-btn mobile-menu" onclick="toggleSidebar()"><i data-lucide="menu"></i></button><div><h1 id="pageTitle">Dashboard</h1><small id="pageSub">Live overview</small></div></div>
-      <div class="top-actions"><div class="search"><i data-lucide="search" width="18"></i><input id="search" placeholder="Search records..." oninput="render()"></div><button class="icon-btn" onclick="loadData()"><i data-lucide="refresh-cw"></i></button></div>
-    </header>
-    <div class="content" id="content"></div>
-  </main>
-</section>
+    <section class="app hidden" id="appScreen">
+      <aside class="sidebar" id="sidebar">
+        <div class="side-brand">
+          <div class="logo"><i data-lucide="building-2"></i></div>
+          <div>
+            <strong>StayWise</strong><span id="roleLabel">Admin Console</span>
+          </div>
+        </div>
+        <nav class="nav" id="nav"></nav>
+        <div class="side-user">
+          <div class="user">
+            <div class="avatar" id="avatar">A</div>
+            <div>
+              <b id="userName">Admin</b
+              ><span id="userMeta">Property Manager</span>
+            </div>
+          </div>
+          <button
+            class="btn secondary"
+            style="width: 100%; margin-top: 10px"
+            onclick="openChangePassword()"
+          >
+            <i data-lucide="key-round"></i>Change Password</button
+          ><button
+            class="btn ghost"
+            style="width: 100%; margin-top: 10px"
+            onclick="logout()"
+          >
+            <i data-lucide="log-out"></i>Logout
+          </button>
+        </div>
+      </aside>
+      <main class="main">
+        <header class="topbar">
+          <div class="row-actions">
+            <button class="icon-btn mobile-menu" onclick="toggleSidebar()">
+              <i data-lucide="menu"></i>
+            </button>
+            <div>
+              <h1 id="pageTitle">Dashboard</h1>
+              <small id="pageSub">Live overview</small>
+            </div>
+          </div>
+          <div class="top-actions">
+            <div class="search">
+              <i data-lucide="search" width="18"></i
+              ><input
+                id="search"
+                placeholder="Search records..."
+                oninput="render()"
+              />
+            </div>
+            <button class="icon-btn" onclick="loadData()">
+              <i data-lucide="refresh-cw"></i>
+            </button>
+          </div>
+        </header>
+        <div class="content" id="content"></div>
+      </main>
+    </section>
 
-<div class="modal-wrap" id="modalWrap" onclick="closeModal(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><h2 id="modalTitle">Action</h2><button class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></button></div>
-    <div class="modal-body" id="modalBody"></div>
-    <div class="modal-actions" id="modalActions"></div>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
+    <div class="modal-wrap" id="modalWrap" onclick="closeModal(event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-hd">
+          <h2 id="modalTitle">Action</h2>
+          <button class="icon-btn" onclick="closeModal()">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-actions" id="modalActions"></div>
+      </div>
+    </div>
+    <div class="toast" id="toast"></div>
 
-<script>
-let role="admin", currentUser=null, state={}, page="dashboard", modalAction=null;
-const navs={admin:[["dashboard","layout-dashboard","Dashboard"],["tenants","users","Tenants"],["rooms","bed","Rooms"],["payments","indian-rupee","Payments"],["complaints","clipboard-list","Complaints"],["notices","megaphone","Notices"],["services","concierge-bell","Services"],["staff","user-cog","Staff"],["inventory","boxes","Inventory"],["reports","bar-chart-3","Reports"],["security","shield-check","Security"]],tenant:[["home","home","My Home"],["my-payments","indian-rupee","Payments"],["my-complaints","clipboard-list","Complaints"],["my-services","concierge-bell","Services"],["my-notices","megaphone","Notices"],["profile","user","Profile"]]};
-const labels={dashboard:["Dashboard","Live property overview"],tenants:["Tenants","Admissions, room mapping and rent records"],rooms:["Rooms","Occupancy and maintenance control"],payments:["Payments","Rent collection, dues and receipts"],complaints:["Complaints","Issue tracking and resolution"],notices:["Notices","Announcements for residents"],services:["Services","Laundry, cleaning and maintenance requests"],staff:["Staff","Shifts and contact directory"],inventory:["Inventory","Stock levels and supplies"],reports:["Reports","Financial and occupancy insights"],security:["Security","Audit logs, backups and queued messages"],home:["My Home","Resident overview"],"my-payments":["My Payments","Rent and receipt history"],"my-complaints":["My Complaints","Raise and track issues"],"my-services":["My Services","Request and track services"],"my-notices":["My Notices","Property announcements"],profile:["Profile","Resident details"]};
-const pagePerms={dashboard:"*",tenants:"tenants:read",rooms:"rooms:read",payments:"payments:read",complaints:"complaints:read",notices:"notices:read",services:"services:read",staff:"staff:read",inventory:"inventory:read",reports:"payments:read",security:"audit:read"};
-function hasPerm(p){const perms=currentUser?.permissions||[];return perms.includes("*")||perms.includes(p)}
-function visibleNav(){const items=role==="tenant"?navs.tenant:navs.admin;return items.filter(n=>role==="tenant"||hasPerm(pagePerms[n[0]]||"*"))}
-function i(name){return `<i data-lucide="${name}" width="18"></i>`}
-function money(n){return "Rs. "+Number(n||0).toLocaleString("en-IN")}
-function today(){return new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}
-function setRole(r){role=r;adminRole.classList.toggle("active",r==="admin");tenantRole.classList.toggle("active",r==="tenant");email.value=r==="admin"?"admin@staywise.in":"rahul@staywise.in";password.value="";lucide.createIcons()}
-function setLoginStatus(msg,type=""){loginStatus.textContent=msg;loginStatus.style.color=type==="error"?"#c2410c":type==="ok"?"#15803d":"#667085";loginStatus.style.fontWeight=type?"800":"400"}
-async function api(path,opts={}){try{const res=await fetch(path,{...opts,credentials:"same-origin",headers:{"Content-Type":"application/json",...(opts.headers||{})}});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||"Request failed");return data}catch(err){if(location.protocol==="file:")throw new Error("Please open the app from its website link, not directly from the file.");if(err instanceof TypeError)throw new Error("App service is not reachable. Please try again in a moment.");throw err}}
-async function login(){try{setLoginStatus("Logging in...");loginBtn.disabled=true;const data=await api("/api/auth/login",{method:"POST",body:JSON.stringify({role,email:email.value.trim(),password:password.value})});setLoginStatus("");boot(data)}catch(err){setLoginStatus(err.message,"error");toast(err.message)}finally{loginBtn.disabled=false}}
-async function checkServer(){try{await api("/api/bootstrap");setLoginStatus("Server connected. Already logged in.","ok")}catch(err){setLoginStatus(err.message==="Login required"?"Server connected. Enter password to login.":err.message,err.message==="Login required"?"ok":"error")}}
-async function logout(){try{await api("/api/auth/logout",{method:"POST"})}catch{}appScreen.classList.add("hidden");loginScreen.classList.remove("hidden")}
-async function loadData(showToast=true){try{const data=await api("/api/bootstrap");boot(data,false);if(showToast)toast("Data refreshed")}catch(err){if(showToast)toast(err.message);throw err}}
-function boot(data,show=true){currentUser=data.user;role=currentUser.role;state=data.data;page=role==="tenant"?"home":(visibleNav()[0]?.[0]||"dashboard");loginScreen.classList.add("hidden");appScreen.classList.remove("hidden");avatar.textContent=currentUser.name[0];userName.textContent=currentUser.name;userMeta.textContent=currentUser.meta;roleLabel.textContent=role==="tenant"?"Tenant Portal":`${role[0].toUpperCase()+role.slice(1)} Console`;buildNav();render();if(show)toast("Login successful");if(currentUser.passwordResetRequired)setTimeout(()=>{openChangePassword();toast("Please change temporary password")},400)}
-function toggleSidebar(){sidebar.classList.toggle("open")}
-function buildNav(){nav.innerHTML=visibleNav().map(n=>`<button class="${page===n[0]?"active":""}" onclick="go('${n[0]}')">${i(n[1])}${n[2]}</button>`).join("");lucide.createIcons()}
-function go(p){page=p;sidebar.classList.remove("open");buildNav();render()}
-function setTitle(){const t=labels[page]||["Page",""];pageTitle.textContent=t[0];pageSub.textContent=t[1]}
-function render(){setTitle();const map={dashboard:adminDash,tenants:tenantsView,rooms:roomsView,payments:paymentsView,complaints:complaintsView,notices:noticesView,services:servicesView,staff:staffView,inventory:inventoryView,reports:reportsView,security:securityView,home:tenantHome,"my-payments":tenantPayments,"my-complaints":tenantComplaints,"my-services":tenantServices,"my-notices":tenantNotices,profile:tenantProfile};content.innerHTML=map[page]();lucide.createIcons()}
-function q(rows,keys){const s=(search.value||"").toLowerCase();return s?rows.filter(r=>keys.some(k=>String(r[k]||"").toLowerCase().includes(s))):rows}
-function stat(label,value,icon,cls){return `<div class="card stat"><div class="stat-icon ${cls}">${i(icon)}</div><b>${value}</b><span>${label}</span></div>`}
-function adminDash(){const occupied=state.rooms.filter(r=>r.status==="occupied").length, revenue=state.payments.filter(p=>p.status==="paid").reduce((s,p)=>s+p.amount,0), dues=state.payments.filter(p=>p.status!=="paid").reduce((s,p)=>s+p.amount,0);return `<div class="grid g4">${stat("Active tenants",state.tenants.length,"users","teal")}${stat("Occupied rooms",`${occupied}/${state.rooms.length}`,"bed","blue")}${stat("Collected",money(revenue),"indian-rupee","green")}${stat("Pending dues",money(dues),"alert-triangle","orange")}</div><div class="quick"><button onclick="openModal('tenant')">${i("user-plus")}Add Tenant</button><button onclick="openModal('room')">${i("door-open")}Add Room</button><button onclick="openModal('payment')">${i("receipt")}Collect Fee</button><button onclick="openModal('complaint')">${i("clipboard-plus")}Log Complaint</button><button onclick="openModal('notice')">${i("megaphone")}Post Notice</button></div><div class="grid g2"><div class="card"><div class="card-hd"><h2>Recent Payments</h2><button class="btn ghost" onclick="go('payments')">View all</button></div><div class="card-body">${table(state.payments.slice(0,4),["id","tenant","amount","status"])}</div></div><div class="card"><div class="card-hd"><h2>Open Complaints</h2><button class="btn ghost" onclick="go('complaints')">Manage</button></div><div class="card-body">${state.complaints.filter(c=>c.status==="open").map(c=>notice(c.issue,c.tenant+" • "+c.priority,c.date)).join("")||empty("No open complaints")}</div></div></div>`}
-function tenantsView(){return cardTable("Tenant Directory",`<button class="btn primary" onclick="openModal('tenant')">${i("user-plus")}Add Tenant</button>`,q(state.tenants,["id","name","phone","room"]).map(t=>({...t,rent:money(t.rent),actions:`<button class="btn secondary" onclick="resetTenantPassword('${t.id}')">${i("key-round")}Reset Password</button> <button class="btn danger" onclick="removeRow('tenants','${t.id}')">${i("trash-2")}Remove</button>`})),["id","name","phone","room","rent","status","actions"])}
-function roomsView(){return `<div class="grid g3">${stat("Vacant",state.rooms.filter(r=>r.status==="vacant").length,"door-open","blue")}${stat("Occupied",state.rooms.filter(r=>r.status==="occupied").length,"bed","green")}${stat("Maintenance",state.rooms.filter(r=>r.status==="maintenance").length,"wrench","orange")}</div>${cardTable("Room Inventory",`<button class="btn primary" onclick="openModal('room')">${i("plus")}Add Room</button>`,q(state.rooms,["num","type","floor","status"]),["num","type","floor","status"])}`}
-function paymentsView(){const settings=state.paymentSettings||{}, pending=state.payments.filter(p=>p.status==="verification_pending").length, dues=state.payments.filter(p=>p.status==="pending"||p.status==="overdue").length;return `<div class="grid g3">${stat("Awaiting verification",pending,"shield-check","purple")}${stat("Pending dues",dues,"bell-ring","orange")}${stat("UPI ID",settings.upiId||"Not set","qr-code","blue")}</div><div class="card"><div class="card-hd"><h2>Payment Setup</h2><button class="btn primary" onclick="openPaymentSettings()">${i("settings")}Edit QR / UPI</button></div><div class="card-body"><div class="payment-box"><img class="qr" src="${qrSrc(settings,9500,"Rent")}" alt="Payment QR"><div><b>${settings.businessName||"StayWise PG"}</b><p style="color:var(--muted);line-height:1.6">UPI: ${settings.upiId||"-"}<br>Payee: ${settings.payeeName||"-"}<br>${settings.instructions||""}</p><div class="invoice-note">Fraud control: tenant submit karne ke baad status <b>verification pending</b> hota hai. Admin bank/UPI statement match karke verify karega, tabhi final paid count hoga.</div></div></div></div></div>${cardTable("Payment Ledger",`<button class="btn primary" onclick="openModal('payment')">${i("receipt")}New Due</button>`,q(state.payments,["id","tenant","room","month","status","transactionId"]).map(p=>({...p,amount:money(p.amount),actions:adminPaymentActions(p)})),["id","tenant","room","amount","month","status","dueDate","transactionId","actions"])}`}
-function complaintsView(){return cardTable("Complaint Register",`<button class="btn primary" onclick="openModal('complaint')">${i("clipboard-plus")}Log Complaint</button>`,q(state.complaints,["id","tenant","issue","priority","status"]).map(c=>({...c,actions:c.status==="open"?`<button class="btn primary" onclick="patchRow('complaints','${c.id}',{status:'resolved'})">${i("check")}Resolve</button>`:""})),["id","tenant","issue","priority","status","date","actions"])}
-function noticesView(){return `<div class="card"><div class="card-hd"><h2>Notice Board</h2><button class="btn primary" onclick="openModal('notice')">${i("plus")}Post Notice</button></div><div class="card-body">${state.notices.map(n=>notice(n.title,n.message,n.tag+" • "+n.date)).join("")||empty("No notices")}</div></div>`}
-function servicesView(){return cardTable("Service Desk",`<button class="btn primary" onclick="openModal('service')">${i("plus")}New Request</button>`,q(state.services,["id","tenant","type","status"]).map(s=>({...s,actions:s.status==="pending"?`<button class="btn primary" onclick="patchRow('services','${s.id}',{status:'completed'})">${i("check")}Complete</button>`:""})),["id","tenant","type","status","date","actions"])}
-function staffView(){return cardTable("Staff Directory",`<button class="btn primary" onclick="openModal('staff')">${i("user-plus")}Add Staff</button>`,state.staff,["id","name","role","phone","shift"])}
-function inventoryView(){return cardTable("Inventory Stock",`<button class="btn primary" onclick="openModal('inventory')">${i("plus")}Add Item</button>`,state.inventory,["id","item","stock","min","status"])}
-function reportsView(){const paid=state.payments.filter(p=>p.status==="paid").length,total=state.payments.length||1,exp=state.expenses.reduce((s,e)=>s+e.amount,0),rev=state.payments.filter(p=>p.status==="paid").reduce((s,p)=>s+p.amount,0);return `<div class="grid g4">${stat("Revenue",money(rev),"trending-up","green")}${stat("Expenses",money(exp),"wallet","orange")}${stat("Net income",money(rev-exp),"landmark","blue")}${stat("Collection rate",Math.round(paid/total*100)+"%","pie-chart","purple")}</div><div class="card"><div class="card-hd"><h2>Monthly Revenue</h2></div><div class="card-body"><div class="chart">${[145,168,176,190,214,238].map((v,k)=>`<div class="bar"><span style="height:${v/2}px"></span><small>${["Jan","Feb","Mar","Apr","May","Jun"][k]}</small></div>`).join("")}</div></div></div>${cardTable("Expenses",`<button class="btn primary" onclick="openModal('expense')">${i("plus")}Add Expense</button>`,state.expenses.map(e=>({...e,amount:money(e.amount)})),["id","category","amount","date"])}`}
-function securityView(){const logs=(state.auditLogs||[]).map(a=>({...a,details:JSON.stringify(a.details||{})}));return `<div class="grid g3">${stat("Activity records",logs.length,"shield-check","blue")}${stat("Secure access","Enabled","key-round","green")}${stat("Payment alerts","Protected","lock","purple")}</div><div class="quick"><button onclick="downloadBackup()">${i("download")}Download Records</button><button onclick="openOutbox()">${i("mail")}Messages</button><button onclick="processOutbox()">${i("send")}Send Messages</button><button onclick="openReadiness()">${i("check-circle")}System Status</button><button onclick="toast('Online payment setup can be enabled when payment gateway details are added')">${i("indian-rupee")}Online Payments</button></div>${cardTable("Recent Activity","",logs,["id","actor","role","action","details","at"])}`}
-function tenant(){return state.tenants[0]||{}}
-function tenantHome(){const t=tenant(), due=state.payments.filter(p=>p.status==="pending"||p.status==="overdue"), paid=state.payments.filter(p=>p.status==="paid").reduce((s,p)=>s+p.amount,0);return `<div class="card"><div class="card-body profile"><div class="big-av">${(t.name||"T")[0]}</div><div><h2>${t.name||currentUser.name}</h2><p>Room ${t.room||"-"} • Monthly rent ${money(t.rent)} • Joined ${t.join||"-"}</p></div><button class="btn primary" onclick="go('my-payments')">${i("indian-rupee")}Pay Rent</button></div></div>${due.length?`<div class="notice reminder"><b>Payment reminder</b><p>${due.length} due payment pending hai. Pay Now se QR/UPI options use karke transaction ID submit karein.</p><small>Due date: ${due[0].dueDate||"-"}</small></div>`:""}<div class="grid g3">${stat("Room",t.room||"-","bed","blue")}${stat("Paid amount",money(paid),"receipt","green")}${stat("Open issues",state.complaints.filter(c=>c.status==="open").length,"alert-circle","orange")}</div><div class="grid g2"><div class="card"><div class="card-hd"><h2>Payment History</h2></div><div class="card-body">${table(state.payments.map(p=>({...p,amount:money(p.amount),actions:tenantPaymentActions(p)})),["month","amount","status","dueDate","actions"])}</div></div><div class="card"><div class="card-hd"><h2>Latest Notices</h2></div><div class="card-body">${state.notices.map(n=>notice(n.title,n.message,n.date)).join("")}</div></div></div>`}
-function tenantPayments(){return `<div class="card"><div class="card-hd"><h2>Admin Payment Details</h2></div><div class="card-body">${tenantPaymentSetup()}</div></div>${cardTable("Payment History","",state.payments.map(p=>({...p,amount:money(p.amount),actions:tenantPaymentActions(p)})),["id","amount","month","status","dueDate","paidAt","method","transactionId","actions"])}`}
-function tenantComplaints(){return cardTable("Complaint Timeline",`<button class="btn primary" onclick="openModal('tenantComplaint')">${i("plus")}Raise Complaint</button>`,state.complaints,["id","issue","priority","status","date"])}
-function tenantServices(){return cardTable("Service Requests",`<button class="btn primary" onclick="openModal('tenantService')">${i("plus")}Request Service</button>`,state.services,["id","type","status","date"])}
-function tenantNotices(){return `<div class="card"><div class="card-hd"><h2>Notice Board</h2></div><div class="card-body">${state.notices.map(n=>notice(n.title,n.message,n.tag+" • "+n.date)).join("")}</div></div>`}
-function tenantProfile(){const t=tenant();return `<div class="card"><div class="card-body profile"><div class="big-av">${(t.name||"T")[0]}</div><div><h2>${t.name||currentUser.name}</h2><p>Phone ${t.phone||"-"} • Room ${t.room||"-"} • Rent ${money(t.rent)} • Status ${t.status||"active"}</p></div><button class="btn secondary" onclick="toast('Profile update request sent')">${i("send")}Request Update</button></div></div>`}
-function adminPaymentActions(p){let actions=[];if(p.status==="verification_pending"){actions.push(`<button class="btn primary" onclick="verifyPayment('${p.id}')">${i("shield-check")}Verify</button>`,`<button class="btn danger" onclick="rejectPayment('${p.id}')">${i("x-circle")}Reject</button>`)}if(p.status==="pending"||p.status==="overdue"){actions.push(`<button class="btn secondary" onclick="sendReminder('${p.id}')">${i("bell")}Remind</button>`)}if(p.status==="paid"||p.status==="verification_pending"){actions.push(`<button class="btn ghost" onclick="downloadInvoice('${p.id}')">${i("download")}Invoice</button>`)}return actions.join(" ")}
-function tenantPaymentActions(p){let actions=[];if(p.status==="pending"||p.status==="overdue"){actions.push(`<button class="btn primary" onclick="openGatewayLink('${p.id}')">${i("credit-card")}Pay Online</button>`,`<button class="btn secondary" onclick="openPayNow('${p.id}')">${i("qr-code")}UPI Proof</button>`)}if(p.status==="verification_pending"){actions.push(`<button class="btn secondary" onclick="downloadInvoice('${p.id}')">${i("download")}Proof Invoice</button>`)}if(p.status==="paid"){actions.push(`<button class="btn ghost" onclick="downloadInvoice('${p.id}')">${i("download")}Invoice</button>`)}return actions.join(" ")}
-function tenantPaymentSetup(amount=tenant().rent||0, month="Rent"){const s=state.paymentSettings||{};return `<div class="payment-box"><img class="qr" src="${qrSrc(s,amount,month)}" alt="Payment QR"><div><b>${s.businessName||"StayWise PG"}</b><p style="color:var(--muted);line-height:1.6">UPI ID: ${s.upiId||"-"}<br>Payee: ${s.payeeName||"-"}<br>Phone: ${s.phone||"-"}</p><div class="pay-options">${payButtons(amount,month)}</div><div class="invoice-note">${s.instructions||"Payment ke baad transaction ID submit karein."}</div></div></div>`}
-function qrSrc(settings,amount,note){if(settings?.qrImage)return settings.qrImage;const upi=upiLink(amount,note);return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upi)}`}
-function upiLink(amount,note){const s=state.paymentSettings||{};return `upi://pay?pa=${encodeURIComponent(s.upiId||"staywise@upi")}&pn=${encodeURIComponent(s.payeeName||s.businessName||"StayWise PG")}&am=${encodeURIComponent(amount||0)}&cu=INR&tn=${encodeURIComponent(note||"PG Rent")}`}
-function payButtons(amount,note){return ["PhonePe","Google Pay","Paytm","Any UPI"].map(name=>`<a class="btn secondary" href="${upiLink(amount,note)}">${name}</a>`).join("")}
-function openPayNow(id){const p=state.payments.find(x=>x.id===id), s=state.paymentSettings||{};modalTitle.textContent=`Pay ${p.month}`;modalBody.innerHTML=`${tenantPaymentSetup(p.amount,p.month)}<div class="field"><label>Paid From</label><select id="m_method"><option>PhonePe</option><option>Google Pay</option><option>Paytm</option><option>BHIM UPI</option><option>Bank Transfer</option><option>Cash</option></select></div><div class="field"><label>Transaction ID / UTR</label><input id="m_txn" placeholder="Example: UPI123456789"></div><div class="field"><label>Note for admin</label><textarea id="m_note" rows="3" placeholder="Screenshot/reference details"></textarea></div><div class="invoice-note">Amount ${money(p.amount)} admin account ${s.upiId||"-"} par bhejne ke baad transaction ID submit karein. Admin verify karega, tab status paid hoga.</div>`;modalActions.innerHTML=`<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="submitPayment('${p.id}')">${i("send")}Submit for Verification</button>`;modalWrap.classList.add("open");lucide.createIcons()}
-async function submitPayment(id){try{await api(`/api/payments/${encodeURIComponent(id)}/submit`,{method:"POST",body:JSON.stringify({method:val("m_method"),transactionId:val("m_txn"),payerNote:val("m_note")})});closeModal();await loadSilent();toast("Payment proof sent to admin")}catch(err){toast(err.message)}}
-async function verifyPayment(id){try{await api(`/api/payments/${encodeURIComponent(id)}/verify`,{method:"PATCH",body:"{}"});await loadSilent();toast("Payment verified as paid")}catch(err){toast(err.message)}}
-async function rejectPayment(id){const reason=prompt("Reject reason?","Transaction not found in account statement");try{await api(`/api/payments/${encodeURIComponent(id)}/reject`,{method:"PATCH",body:JSON.stringify({reason:reason||"Rejected by admin"})});await loadSilent();toast("Payment proof rejected")}catch(err){toast(err.message)}}
-async function sendReminder(id){try{await api(`/api/payments/${encodeURIComponent(id)}/remind`,{method:"POST",body:"{}"});await loadSilent();toast("Reminder marked for tenant")}catch(err){toast(err.message)}}
-async function openGatewayLink(id){try{const link=await api(`/api/payments/${encodeURIComponent(id)}/gateway-link`,{method:"POST",body:"{}"});if(link.checkoutUrl){window.open(link.checkoutUrl,"_blank","noopener");toast("Secure payment link opened");return}toast(link.message||"Gateway is not configured; use UPI proof flow")}catch(err){toast(err.message)}}
-function openPaymentSettings(){const s=state.paymentSettings||{};modalTitle.textContent="Payment QR / UPI Setup";modalBody.innerHTML=`<div class="field"><label>Business Name</label><input id="m_business" value="${s.businessName||""}"></div><div class="field"><label>UPI ID</label><input id="m_upi" value="${s.upiId||""}" placeholder="yourname@upi"></div><div class="field"><label>Payee Name</label><input id="m_payee" value="${s.payeeName||""}"></div><div class="field"><label>Phone</label><input id="m_phone" value="${s.phone||""}"></div><div class="field"><label>Upload QR Image</label><input id="m_qr_file" type="file" accept="image/*" onchange="previewQrUpload(this)"></div><div class="payment-box"><img class="qr" id="m_qr_preview" src="${qrSrc(s,9500,"Rent")}" alt="QR preview"><div class="invoice-note">Admin yahan apna PhonePe, Paytm, Google Pay ya bank UPI QR upload kar sakta hai. Upload ke baad tenants ko wahi QR dikhega.</div></div><div class="field"><label>QR Image URL optional</label><input id="m_qr" value="${s.qrImage||""}" placeholder="Paste custom QR image URL"></div><div class="field"><label>Instructions</label><textarea id="m_inst" rows="4">${s.instructions||""}</textarea></div>`;modalActions.innerHTML=`<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="savePaymentSettings()">${i("save")}Save</button>`;modalWrap.classList.add("open");lucide.createIcons()}
-function previewQrUpload(input){const file=input.files?.[0];if(!file)return;if(file.size>2_500_000){toast("QR image 2.5MB se chhota rakhein");input.value="";return}const reader=new FileReader();reader.onload=()=>{document.getElementById("m_qr").value=reader.result;document.getElementById("m_qr_preview").src=reader.result};reader.readAsDataURL(file)}
-async function savePaymentSettings(){try{await api("/api/payment-settings",{method:"PATCH",body:JSON.stringify({businessName:val("m_business"),upiId:val("m_upi"),payeeName:val("m_payee"),phone:val("m_phone"),qrImage:val("m_qr"),instructions:val("m_inst")})});closeModal();await loadSilent();toast("Payment settings updated")}catch(err){toast(err.message)}}
-function openChangePassword(){modalTitle.textContent="Change Password";modalBody.innerHTML=`<div class="field"><label>Current Password</label><input id="m_current_pass" type="password"></div><div class="field"><label>New Password</label><input id="m_new_pass" type="password" placeholder="Minimum 10 characters"></div>`;modalActions.innerHTML=`<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="changePassword()">${i("key-round")}Update Password</button>`;modalWrap.classList.add("open");lucide.createIcons()}
-async function changePassword(){try{await api("/api/auth/change-password",{method:"POST",body:JSON.stringify({currentPassword:val("m_current_pass"),newPassword:val("m_new_pass")})});closeModal();toast("Password updated")}catch(err){toast(err.message)}}
-async function downloadBackup(){try{const res=await fetch("/api/admin/backup",{credentials:"same-origin"});if(!res.ok){const data=await res.json().catch(()=>({}));throw new Error(data.error||"Backup failed")}const blob=await res.blob();const link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download=`staywise-backup-${Date.now()}.json`;link.click();URL.revokeObjectURL(link.href);toast("Backup downloaded")}catch(err){toast(err.message)}}
-async function openOutbox(){try{const rows=await api("/api/admin/outbox");modalTitle.textContent="Messages";modalBody.innerHTML=`<div style="overflow:auto">${table(rows.map(x=>({...x,preview:x.previewUrl?`<a href="${x.previewUrl}" target="_blank" rel="noopener">Open</a>`:"-",meta:JSON.stringify(x.meta||{})})),["id","type","to","subject","status","createdAt","preview","meta"])}</div>`;modalActions.innerHTML=`<button class="btn primary" onclick="closeModal()">Done</button>`;modalWrap.classList.add("open");lucide.createIcons()}catch(err){toast(err.message)}}
-async function processOutbox(){try{const r=await api("/api/admin/outbox/process",{method:"POST",body:"{}"});toast(`Processed ${r.processed}, sent ${r.sent}`)}catch(err){toast(err.message)}}
-async function openReadiness(){try{const r=await api("/api/admin/readiness");modalTitle.textContent="System Status";const rows=[["Secure website",r.httpsConfigured],["Records connected",r.mongoConfigured],["Payment safety",r.paymentWebhookConfigured],["Online payment links",r.razorpayConfigured],["Email service",r.smtpConfigured],["SMS or WhatsApp",r.twilioConfigured||r.smsWebhookConfigured],["Image uploads",r.cloudinaryConfigured||r.s3Configured],["Daily backups",Number(r.backupIntervalHours)>0]].map(([item,ready])=>({item,status:ready?"Ready":"Not set"}));modalBody.innerHTML=`<div style="overflow:auto">${table(rows,["item","status"])}</div>`;modalActions.innerHTML=`<button class="btn primary" onclick="closeModal()">Done</button>`;modalWrap.classList.add("open");lucide.createIcons()}catch(err){toast(err.message)}}
-async function resetTenantPassword(id){try{const data=await api(`/api/tenants/${encodeURIComponent(id)}/reset-password`,{method:"POST",body:"{}"});modalTitle.textContent="Temporary Password";modalBody.innerHTML=`<div class="invoice-note">Tenant temporary password:<br><b style="font-size:18px">${data.temporaryPassword}</b><br>Ye outbox me bhi queue ho gaya hai. Tenant ko privately share karein aur login ke baad password change karwayen.</div>`;modalActions.innerHTML=`<button class="btn primary" onclick="closeModal()">Done</button>`;modalWrap.classList.add("open");lucide.createIcons()}catch(err){toast(err.message)}}
-async function downloadInvoice(id){try{const invoice=await api(`/api/payments/${encodeURIComponent(id)}/invoice`);const html=invoiceHtml(invoice);const blob=new Blob([html],{type:"text/html"});const link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download=`${invoice.invoiceNo}.html`;link.click();URL.revokeObjectURL(link.href)}catch(err){toast(err.message)}}
-function invoiceHtml(x){return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${x.invoiceNo}</title><style>*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#111827;padding:24px;margin:0}.box{max-width:760px;margin:auto;border:1px solid #ddd;padding:24px}.top{display:flex;justify-content:space-between;gap:16px;border-bottom:2px solid #111827;padding-bottom:16px}.paid{color:#15803d}.pending{color:#b7791f}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}.item{padding:12px;background:#f8fafc;min-width:0}.label{font-size:12px;color:#667085;text-transform:uppercase}.value{font-weight:700;margin-top:4px;overflow-wrap:anywhere}.foot{margin-top:24px;color:#667085;font-size:13px;line-height:1.5}@media(max-width:620px){body{padding:10px}.box{padding:16px}.top,.row{grid-template-columns:1fr;display:grid}.top h1,.top h2{margin:0 0 8px}}</style></head><body><div class="box"><div class="top"><div><h1>${x.businessName}</h1><p>UPI: ${x.upiId||"-"}</p></div><div><h2>${x.invoiceNo}</h2><b class="${x.status==="paid"?"paid":"pending"}">${x.status.replace("_"," ").toUpperCase()}</b></div></div><div class="row">${Object.entries({"Tenant":x.tenant,"Room":x.room,"Phone":x.phone,"Email":x.email,"Month":x.month,"Amount":money(x.amount),"Due Date":x.dueDate,"Paid At":x.paidAt,"Method":x.method,"Transaction ID":x.transactionId,"Verified By":x.verifiedBy,"Verified At":x.verifiedAt}).map(([k,v])=>`<div class="item"><div class="label">${k}</div><div class="value">${v||"-"}</div></div>`).join("")}</div><div class="foot">Generated at ${x.generatedAt}. Verification pending invoice is payment proof only; final receipt is valid after admin verification.</div></div></body></html>`}
-function table(rows,cols){if(!rows.length)return empty("No records found");return `<table><thead><tr>${cols.map(c=>`<th>${labelize(c)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td data-label="${labelize(c)}">${cell(r[c])}</td>`).join("")}</tr>`).join("")}</tbody></table>`}
-function labelize(key){return String(key).replace(/([A-Z])/g," $1").replace(/_/g," ").replace(/^./,c=>c.toUpperCase())}
-function cardTable(h,action,rows,cols){return `<div class="card"><div class="card-hd"><h2>${h}</h2><div class="row-actions">${action}</div></div><div class="card-body" style="overflow:auto">${table(rows,cols)}</div></div>`}
-function cell(v){const s=String(v??"");return ["paid","pending","overdue","verification_pending","open","resolved","occupied","vacant","maintenance","active","low","ok","completed"].includes(s)?`<span class="badge ${s}">${s.replace("_"," ")}</span>`:s}
-function notice(a,b,c){return `<div class="notice"><b>${a}</b><p>${b}</p><small>${c}</small></div>`}
-function empty(s){return `<div class="empty">${s}</div>`}
-function opts(rows,label="name"){return rows.map(r=>`<option>${r[label]}</option>`).join("")}
-const forms={tenant:["Add Tenant",()=>`<div class="field"><label>Name</label><input id="m_name"></div><div class="field"><label>Phone</label><input id="m_phone"></div><div class="field"><label>Email</label><input id="m_email"></div><div class="field"><label>Room</label><select id="m_room">${opts(state.rooms,"num")}</select></div><div class="field"><label>Rent</label><input id="m_rent" type="number" value="9000"></div>`,()=>createRow("tenants",{name:val("m_name")||"New Tenant",phone:val("m_phone")||"9999999999",email:val("m_email")||"",room:val("m_room"),rent:+val("m_rent")||9000,status:"active",join:today()})],room:["Add Room",()=>`<div class="field"><label>Room No.</label><input id="m_num"></div><div class="field"><label>Type</label><select id="m_type"><option>Single</option><option>Double</option><option>Triple</option></select></div><div class="field"><label>Floor</label><input id="m_floor" value="1"></div><div class="field"><label>Status</label><select id="m_status"><option>vacant</option><option>occupied</option><option>maintenance</option></select></div>`,()=>createRow("rooms",{num:val("m_num"),type:val("m_type"),floor:val("m_floor"),status:val("m_status")})],payment:["New Payment",()=>`<div class="field"><label>Tenant</label><select id="m_tenant">${opts(state.tenants)}</select></div><div class="field"><label>Amount</label><input id="m_amount" type="number" value="9000"></div><div class="field"><label>Month</label><input id="m_month" value="Jun 2026"></div><div class="field"><label>Status</label><select id="m_status"><option>paid</option><option>pending</option><option>overdue</option></select></div>`,()=>{let t=state.tenants.find(x=>x.name===val("m_tenant"));return createRow("payments",{tenant:t.name,room:t.room,amount:+val("m_amount")||0,month:val("m_month"),status:val("m_status"),date:val("m_status")==="paid"?today():"-"})}],complaint:["Log Complaint",()=>`<div class="field"><label>Tenant</label><select id="m_tenant">${opts(state.tenants)}</select></div><div class="field"><label>Issue</label><textarea id="m_issue" rows="4"></textarea></div><div class="field"><label>Priority</label><select id="m_priority"><option>High</option><option>Medium</option><option>Low</option></select></div>`,()=>createRow("complaints",{tenant:val("m_tenant"),issue:val("m_issue")||"General issue",priority:val("m_priority"),status:"open",date:today()})],notice:["Post Notice",()=>`<div class="field"><label>Title</label><input id="m_title"></div><div class="field"><label>Message</label><textarea id="m_msg" rows="4"></textarea></div><div class="field"><label>Tag</label><select id="m_tag"><option>Important</option><option>Finance</option><option>Maintenance</option><option>Event</option></select></div>`,()=>createRow("notices",{title:val("m_title")||"Notice",message:val("m_msg")||"Details will be shared soon.",tag:val("m_tag"),date:today()})],service:["New Service Request",()=>`<div class="field"><label>Tenant</label><select id="m_tenant">${opts(state.tenants)}</select></div><div class="field"><label>Service</label><select id="m_type"><option>Laundry</option><option>Room Cleaning</option><option>Plumbing</option><option>Electrician</option></select></div>`,()=>createRow("services",{tenant:val("m_tenant"),type:val("m_type"),status:"pending",date:today()})],staff:["Add Staff",()=>`<div class="field"><label>Name</label><input id="m_name"></div><div class="field"><label>Role</label><input id="m_role"></div><div class="field"><label>Phone</label><input id="m_phone"></div><div class="field"><label>Shift</label><select id="m_shift"><option>Morning</option><option>Evening</option><option>Night</option></select></div>`,()=>createRow("staff",{name:val("m_name")||"Staff Member",role:val("m_role")||"Support",phone:val("m_phone")||"9000000000",shift:val("m_shift")})],inventory:["Add Inventory",()=>`<div class="field"><label>Item</label><input id="m_item"></div><div class="field"><label>Stock</label><input id="m_stock" type="number"></div><div class="field"><label>Minimum Stock</label><input id="m_min" type="number"></div>`,()=>createRow("inventory",{item:val("m_item")||"Item",stock:+val("m_stock")||0,min:+val("m_min")||0})],expense:["Add Expense",()=>`<div class="field"><label>Category</label><input id="m_cat"></div><div class="field"><label>Amount</label><input id="m_amount" type="number"></div>`,()=>createRow("expenses",{category:val("m_cat")||"Expense",amount:+val("m_amount")||0,date:today()})],tenantComplaint:["Raise Complaint",()=>`<div class="field"><label>Issue</label><textarea id="m_issue" rows="4"></textarea></div><div class="field"><label>Priority</label><select id="m_priority"><option>High</option><option>Medium</option><option>Low</option></select></div>`,()=>createRow("complaints",{tenant:tenant().name,issue:val("m_issue")||"Resident issue",priority:val("m_priority"),status:"open",date:today()})],tenantService:["Request Service",()=>`<div class="field"><label>Service</label><select id="m_type"><option>Laundry</option><option>Room Cleaning</option><option>Plumbing</option><option>Electrician</option></select></div>`,()=>createRow("services",{tenant:tenant().name,type:val("m_type"),status:"pending",date:today()})]};
-forms.payment=["New Payment Due",()=>`<div class="field"><label>Tenant</label><select id="m_tenant">${opts(state.tenants)}</select></div><div class="field"><label>Amount</label><input id="m_amount" type="number" value="9000"></div><div class="field"><label>Month</label><input id="m_month" value="Jun 2026"></div><div class="field"><label>Due Date</label><input id="m_due" value="07 Jun 2026"></div><div class="field"><label>Status</label><select id="m_status"><option>pending</option><option>overdue</option></select></div>`,()=>{let t=state.tenants.find(x=>x.name===val("m_tenant"));return createRow("payments",{tenant:t.name,room:t.room,amount:+val("m_amount")||0,month:val("m_month"),dueDate:val("m_due"),status:val("m_status"),date:"-"})}];
-function openModal(type){const f=forms[type];modalTitle.textContent=f[0];modalBody.innerHTML=f[1]();modalActions.innerHTML=`<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="modalAction()">${i("check")}Save</button>`;modalAction=f[2];modalWrap.classList.add("open");lucide.createIcons()}
-function closeModal(e){if(e&&e.target.id!=="modalWrap")return;modalWrap.classList.remove("open")}
-function val(id){return document.getElementById(id)?.value?.trim()||""}
-async function createRow(collection,payload){try{await api(`/api/${collection}`,{method:"POST",body:JSON.stringify(payload)});closeModal();await loadSilent();toast("Saved successfully")}catch(err){toast(err.message)}}
-async function patchRow(collection,id,payload){try{await api(`/api/${collection}/${encodeURIComponent(id)}`,{method:"PATCH",body:JSON.stringify(payload)});await loadSilent();toast("Updated successfully")}catch(err){toast(err.message)}}
-async function removeRow(collection,id){try{await api(`/api/${collection}/${encodeURIComponent(id)}`,{method:"DELETE"});await loadSilent();toast("Removed successfully")}catch(err){toast(err.message)}}
-async function loadSilent(){const data=await api("/api/bootstrap");currentUser=data.user;state=data.data;buildNav();render()}
-function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2300)}
-password.addEventListener("keydown",e=>{if(e.key==="Enter")login()});email.addEventListener("keydown",e=>{if(e.key==="Enter")login()});setRole("admin");loadData(false).catch(()=>checkServer());lucide.createIcons();
-</script>
-</body>
+    <script>
+      let role = "admin",
+        currentUser = null,
+        state = {},
+        page = "dashboard",
+        modalAction = null;
+      const navs = {
+        admin: [
+          ["dashboard", "layout-dashboard", "Dashboard"],
+          ["tenants", "users", "Tenants"],
+          ["rooms", "bed", "Rooms"],
+          ["payments", "indian-rupee", "Payments"],
+          ["complaints", "clipboard-list", "Complaints"],
+          ["notices", "megaphone", "Notices"],
+          ["services", "concierge-bell", "Services"],
+          ["staff", "user-cog", "Staff"],
+          ["inventory", "boxes", "Inventory"],
+          ["reports", "bar-chart-3", "Reports"],
+          ["security", "shield-check", "Security"],
+        ],
+        tenant: [
+          ["home", "home", "My Home"],
+          ["my-payments", "indian-rupee", "Payments"],
+          ["my-complaints", "clipboard-list", "Complaints"],
+          ["my-services", "concierge-bell", "Services"],
+          ["my-notices", "megaphone", "Notices"],
+          ["profile", "user", "Profile"],
+        ],
+      };
+      const labels = {
+        dashboard: ["Dashboard", "Live property overview"],
+        tenants: ["Tenants", "Admissions, room mapping and rent records"],
+        rooms: ["Rooms", "Occupancy and maintenance control"],
+        payments: ["Payments", "Rent collection, dues and receipts"],
+        complaints: ["Complaints", "Issue tracking and resolution"],
+        notices: ["Notices", "Announcements for residents"],
+        services: ["Services", "Laundry, cleaning and maintenance requests"],
+        staff: ["Staff", "Shifts and contact directory"],
+        inventory: ["Inventory", "Stock levels and supplies"],
+        reports: ["Reports", "Financial and occupancy insights"],
+        security: ["Security", "Audit logs, backups and queued messages"],
+        home: ["My Home", "Resident overview"],
+        "my-payments": ["My Payments", "Rent and receipt history"],
+        "my-complaints": ["My Complaints", "Raise and track issues"],
+        "my-services": ["My Services", "Request and track services"],
+        "my-notices": ["My Notices", "Property announcements"],
+        profile: ["Profile", "Resident details"],
+      };
+      const pagePerms = {
+        dashboard: "*",
+        tenants: "tenants:read",
+        rooms: "rooms:read",
+        payments: "payments:read",
+        complaints: "complaints:read",
+        notices: "notices:read",
+        services: "services:read",
+        staff: "staff:read",
+        inventory: "inventory:read",
+        reports: "payments:read",
+        security: "audit:read",
+      };
+      function hasPerm(p) {
+        const perms = currentUser?.permissions || [];
+        return perms.includes("*") || perms.includes(p);
+      }
+      function visibleNav() {
+        const items = role === "tenant" ? navs.tenant : navs.admin;
+        return items.filter(
+          (n) => role === "tenant" || hasPerm(pagePerms[n[0]] || "*"),
+        );
+      }
+      function i(name) {
+        return `<i data-lucide="${name}" width="18"></i>`;
+      }
+      function money(n) {
+        return "Rs. " + Number(n || 0).toLocaleString("en-IN");
+      }
+      function today() {
+        return new Date().toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      }
+      function setRole(r) {
+        role = r;
+        adminRole.classList.toggle("active", r === "admin");
+        tenantRole.classList.toggle("active", r === "tenant");
+        email.value = r === "admin" ? "admin@staywise.in" : "rahul@staywise.in";
+        password.value = "";
+        lucide.createIcons();
+      }
+      function setLoginStatus(msg, type = "") {
+        loginStatus.textContent = msg;
+        loginStatus.style.color =
+          type === "error" ? "#c2410c" : type === "ok" ? "#15803d" : "#667085";
+        loginStatus.style.fontWeight = type ? "800" : "400";
+      }
+      async function api(path, opts = {}) {
+        try {
+          const res = await fetch(path, {
+            ...opts,
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+              ...(opts.headers || {}),
+            },
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error || "Request failed");
+          return data;
+        } catch (err) {
+          if (location.protocol === "file:")
+            throw new Error(
+              "Please open the app from its website link, not directly from the file.",
+            );
+          if (err instanceof TypeError)
+            throw new Error(
+              "App service is not reachable. Please try again in a moment.",
+            );
+          throw err;
+        }
+      }
+      async function login() {
+        try {
+          setLoginStatus("Logging in...");
+          loginBtn.disabled = true;
+          const data = await api("/api/auth/login", {
+            method: "POST",
+            body: JSON.stringify({
+              role,
+              email: email.value.trim(),
+              password: password.value,
+            }),
+          });
+          setLoginStatus("");
+          boot(data);
+        } catch (err) {
+          setLoginStatus(err.message, "error");
+          toast(err.message);
+        } finally {
+          loginBtn.disabled = false;
+        }
+      }
+      function openRegister() {
+        modalTitle.textContent = "Tenant Registration";
+        modalBody.innerHTML = `<div class="field"><label>Full Name</label><input id="r_name" autocomplete="name"></div><div class="field"><label>Email</label><input id="r_email" type="email" autocomplete="email"></div><div class="field"><label>Phone Number</label><input id="r_phone" inputmode="numeric" maxlength="10" placeholder="10 digit mobile"></div><div class="field"><label>Aadhaar Number</label><input id="r_aadhaar" inputmode="numeric" maxlength="12" placeholder="12 digit Aadhaar"></div><div class="field"><label>Password</label><input id="r_password" type="password" autocomplete="new-password" placeholder="Minimum 10 characters"></div><div class="invoice-note">Aadhaar database mein masked format aur secure hash ke saath save hota hai. Admin verification ke baad room details assign karega.</div>`;
+        modalActions.innerHTML = `<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" id="registerBtn" onclick="registerTenant()">${i("user-plus")}Register</button>`;
+        modalWrap.classList.add("open");
+        lucide.createIcons();
+      }
+      async function registerTenant() {
+        try {
+          registerBtn.disabled = true;
+          const payload = {
+            name: val("r_name"),
+            email: val("r_email"),
+            phone: val("r_phone"),
+            aadhaar: val("r_aadhaar"),
+            password: val("r_password"),
+          };
+          await api("/api/auth/register", {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+          closeModal();
+          setRole("tenant");
+          email.value = payload.email;
+          password.value = "";
+          setLoginStatus(
+            "Registration saved. Admin verification pending; password se tenant login kar sakte hain.",
+            "ok",
+          );
+          toast("Registration saved");
+        } catch (err) {
+          toast(err.message);
+        } finally {
+          if (document.getElementById("registerBtn"))
+            registerBtn.disabled = false;
+        }
+      }
+      async function checkServer() {
+        try {
+          await api("/api/bootstrap");
+          setLoginStatus("Server connected. Already logged in.", "ok");
+        } catch (err) {
+          setLoginStatus(
+            err.message === "Login required"
+              ? "Server connected. Enter password to login."
+              : err.message,
+            err.message === "Login required" ? "ok" : "error",
+          );
+        }
+      }
+      async function logout() {
+        try {
+          await api("/api/auth/logout", { method: "POST" });
+        } catch {}
+        appScreen.classList.add("hidden");
+        loginScreen.classList.remove("hidden");
+      }
+      async function loadData(showToast = true) {
+        try {
+          const data = await api("/api/bootstrap");
+          boot(data, false);
+          if (showToast) toast("Data refreshed");
+        } catch (err) {
+          if (showToast) toast(err.message);
+          throw err;
+        }
+      }
+      function boot(data, show = true) {
+        currentUser = data.user;
+        role = currentUser.role;
+        state = data.data;
+        page = role === "tenant" ? "home" : visibleNav()[0]?.[0] || "dashboard";
+        loginScreen.classList.add("hidden");
+        appScreen.classList.remove("hidden");
+        avatar.textContent = currentUser.name[0];
+        userName.textContent = currentUser.name;
+        userMeta.textContent = currentUser.meta;
+        roleLabel.textContent =
+          role === "tenant"
+            ? "Tenant Portal"
+            : `${role[0].toUpperCase() + role.slice(1)} Console`;
+        buildNav();
+        render();
+        if (show) toast("Login successful");
+        if (currentUser.passwordResetRequired)
+          setTimeout(() => {
+            openChangePassword();
+            toast("Please change temporary password");
+          }, 400);
+      }
+      function toggleSidebar() {
+        sidebar.classList.toggle("open");
+      }
+      function buildNav() {
+        nav.innerHTML = visibleNav()
+          .map(
+            (n) =>
+              `<button class="${page === n[0] ? "active" : ""}" onclick="go('${n[0]}')">${i(n[1])}${n[2]}</button>`,
+          )
+          .join("");
+        lucide.createIcons();
+      }
+      function go(p) {
+        page = p;
+        sidebar.classList.remove("open");
+        buildNav();
+        render();
+      }
+      function setTitle() {
+        const t = labels[page] || ["Page", ""];
+        pageTitle.textContent = t[0];
+        pageSub.textContent = t[1];
+      }
+      function render() {
+        setTitle();
+        const map = {
+          dashboard: adminDash,
+          tenants: tenantsView,
+          rooms: roomsView,
+          payments: paymentsView,
+          complaints: complaintsView,
+          notices: noticesView,
+          services: servicesView,
+          staff: staffView,
+          inventory: inventoryView,
+          reports: reportsView,
+          security: securityView,
+          home: tenantHome,
+          "my-payments": tenantPayments,
+          "my-complaints": tenantComplaints,
+          "my-services": tenantServices,
+          "my-notices": tenantNotices,
+          profile: tenantProfile,
+        };
+        content.innerHTML = map[page]();
+        lucide.createIcons();
+      }
+      function q(rows, keys) {
+        const s = (search.value || "").toLowerCase();
+        return s
+          ? rows.filter((r) =>
+              keys.some((k) =>
+                String(r[k] || "")
+                  .toLowerCase()
+                  .includes(s),
+              ),
+            )
+          : rows;
+      }
+      function stat(label, value, icon, cls) {
+        return `<div class="card stat"><div class="stat-icon ${cls}">${i(icon)}</div><b>${value}</b><span>${label}</span></div>`;
+      }
+      function adminDash() {
+        const occupied = state.rooms.filter(
+            (r) => r.status === "occupied",
+          ).length,
+          revenue = state.payments
+            .filter((p) => p.status === "paid")
+            .reduce((s, p) => s + p.amount, 0),
+          dues = state.payments
+            .filter((p) => p.status !== "paid")
+            .reduce((s, p) => s + p.amount, 0);
+        return `<div class="grid g4">${stat("Active tenants", state.tenants.length, "users", "teal")}${stat("Occupied rooms", `${occupied}/${state.rooms.length}`, "bed", "blue")}${stat("Collected", money(revenue), "indian-rupee", "green")}${stat("Pending dues", money(dues), "alert-triangle", "orange")}</div><div class="quick"><button onclick="openModal('tenant')">${i("user-plus")}Add Tenant</button><button onclick="openModal('room')">${i("door-open")}Add Room</button><button onclick="openModal('payment')">${i("receipt")}Collect Fee</button><button onclick="openModal('complaint')">${i("clipboard-plus")}Log Complaint</button><button onclick="openModal('notice')">${i("megaphone")}Post Notice</button></div><div class="grid g2"><div class="card"><div class="card-hd"><h2>Recent Payments</h2><button class="btn ghost" onclick="go('payments')">View all</button></div><div class="card-body">${table(state.payments.slice(0, 4), ["id", "tenant", "amount", "status"])}</div></div><div class="card"><div class="card-hd"><h2>Open Complaints</h2><button class="btn ghost" onclick="go('complaints')">Manage</button></div><div class="card-body">${
+          state.complaints
+            .filter((c) => c.status === "open")
+            .map((c) => notice(c.issue, c.tenant + " • " + c.priority, c.date))
+            .join("") || empty("No open complaints")
+        }</div></div></div>`;
+      }
+      function tenantsView() {
+        return cardTable(
+          "Tenant Directory",
+          `<button class="btn primary" onclick="openModal('tenant')">${i("user-plus")}Add Tenant</button>`,
+          q(state.tenants, ["id", "name", "email", "phone", "room"]).map(
+            (t) => ({
+              ...t,
+              rent: money(t.rent),
+              aadhaar: t.aadhaarMasked || "-",
+              proofStatus: t.proofStatus || "-",
+              actions: `${t.proofStatus === "pending" ? `<button class="btn primary" onclick="verifyTenant('${t.id}')">${i("shield-check")}Verify</button> ` : ""}<button class="btn secondary" onclick="resetTenantPassword('${t.id}')">${i("key-round")}Reset Password</button> <button class="btn danger" onclick="removeRow('tenants','${t.id}')">${i("trash-2")}Remove</button>`,
+            }),
+          ),
+          [
+            "id",
+            "name",
+            "email",
+            "phone",
+            "aadhaar",
+            "room",
+            "rent",
+            "status",
+            "proofStatus",
+            "actions",
+          ],
+        );
+      }
+      function roomsView() {
+        return `<div class="grid g3">${stat("Vacant", state.rooms.filter((r) => r.status === "vacant").length, "door-open", "blue")}${stat("Occupied", state.rooms.filter((r) => r.status === "occupied").length, "bed", "green")}${stat("Maintenance", state.rooms.filter((r) => r.status === "maintenance").length, "wrench", "orange")}</div>${cardTable("Room Inventory", `<button class="btn primary" onclick="openModal('room')">${i("plus")}Add Room</button>`, q(state.rooms, ["num", "type", "floor", "status"]), ["num", "type", "floor", "status"])}`;
+      }
+      function paymentsView() {
+        const settings = state.paymentSettings || {},
+          pending = state.payments.filter(
+            (p) => p.status === "verification_pending",
+          ).length,
+          dues = state.payments.filter(
+            (p) => p.status === "pending" || p.status === "overdue",
+          ).length;
+        return `<div class="grid g3">${stat("Awaiting verification", pending, "shield-check", "purple")}${stat("Pending dues", dues, "bell-ring", "orange")}${stat("UPI ID", settings.upiId || "Not set", "qr-code", "blue")}</div><div class="card"><div class="card-hd"><h2>Payment Setup</h2><button class="btn primary" onclick="openPaymentSettings()">${i("settings")}Edit QR / UPI</button></div><div class="card-body"><div class="payment-box"><img class="qr" src="${qrSrc(settings, 9500, "Rent")}" alt="Payment QR"><div><b>${settings.businessName || "StayWise PG"}</b><p style="color:var(--muted);line-height:1.6">UPI: ${settings.upiId || "-"}<br>Payee: ${settings.payeeName || "-"}<br>${settings.instructions || ""}</p><div class="invoice-note">Fraud control: tenant submit karne ke baad status <b>verification pending</b> hota hai. Admin bank/UPI statement match karke verify karega, tabhi final paid count hoga.</div></div></div></div></div>${cardTable(
+          "Payment Ledger",
+          `<button class="btn primary" onclick="openModal('payment')">${i("receipt")}New Due</button>`,
+          q(state.payments, [
+            "id",
+            "tenant",
+            "room",
+            "month",
+            "status",
+            "transactionId",
+          ]).map((p) => ({
+            ...p,
+            amount: money(p.amount),
+            actions: adminPaymentActions(p),
+          })),
+          [
+            "id",
+            "tenant",
+            "room",
+            "amount",
+            "month",
+            "status",
+            "dueDate",
+            "transactionId",
+            "actions",
+          ],
+        )}`;
+      }
+      function complaintsView() {
+        return cardTable(
+          "Complaint Register",
+          `<button class="btn primary" onclick="openModal('complaint')">${i("clipboard-plus")}Log Complaint</button>`,
+          q(state.complaints, [
+            "id",
+            "tenant",
+            "issue",
+            "priority",
+            "status",
+          ]).map((c) => ({
+            ...c,
+            actions:
+              c.status === "open"
+                ? `<button class="btn primary" onclick="patchRow('complaints','${c.id}',{status:'resolved'})">${i("check")}Resolve</button>`
+                : "",
+          })),
+          ["id", "tenant", "issue", "priority", "status", "date", "actions"],
+        );
+      }
+      function noticesView() {
+        return `<div class="card"><div class="card-hd"><h2>Notice Board</h2><button class="btn primary" onclick="openModal('notice')">${i("plus")}Post Notice</button></div><div class="card-body">${state.notices.map((n) => notice(n.title, n.message, n.tag + " • " + n.date)).join("") || empty("No notices")}</div></div>`;
+      }
+      function servicesView() {
+        return cardTable(
+          "Service Desk",
+          `<button class="btn primary" onclick="openModal('service')">${i("plus")}New Request</button>`,
+          q(state.services, ["id", "tenant", "type", "status"]).map((s) => ({
+            ...s,
+            actions:
+              s.status === "pending"
+                ? `<button class="btn primary" onclick="patchRow('services','${s.id}',{status:'completed'})">${i("check")}Complete</button>`
+                : "",
+          })),
+          ["id", "tenant", "type", "status", "date", "actions"],
+        );
+      }
+      function staffView() {
+        return cardTable(
+          "Staff Directory",
+          `<button class="btn primary" onclick="openModal('staff')">${i("user-plus")}Add Staff</button>`,
+          state.staff,
+          ["id", "name", "role", "phone", "shift"],
+        );
+      }
+      function inventoryView() {
+        return cardTable(
+          "Inventory Stock",
+          `<button class="btn primary" onclick="openModal('inventory')">${i("plus")}Add Item</button>`,
+          state.inventory,
+          ["id", "item", "stock", "min", "status"],
+        );
+      }
+      function reportsView() {
+        const paid = state.payments.filter((p) => p.status === "paid").length,
+          total = state.payments.length || 1,
+          exp = state.expenses.reduce((s, e) => s + e.amount, 0),
+          rev = state.payments
+            .filter((p) => p.status === "paid")
+            .reduce((s, p) => s + p.amount, 0);
+        return `<div class="grid g4">${stat("Revenue", money(rev), "trending-up", "green")}${stat("Expenses", money(exp), "wallet", "orange")}${stat("Net income", money(rev - exp), "landmark", "blue")}${stat("Collection rate", Math.round((paid / total) * 100) + "%", "pie-chart", "purple")}</div><div class="card"><div class="card-hd"><h2>Monthly Revenue</h2></div><div class="card-body"><div class="chart">${[145, 168, 176, 190, 214, 238].map((v, k) => `<div class="bar"><span style="height:${v / 2}px"></span><small>${["Jan", "Feb", "Mar", "Apr", "May", "Jun"][k]}</small></div>`).join("")}</div></div></div>${cardTable(
+          "Expenses",
+          `<button class="btn primary" onclick="openModal('expense')">${i("plus")}Add Expense</button>`,
+          state.expenses.map((e) => ({ ...e, amount: money(e.amount) })),
+          ["id", "category", "amount", "date"],
+        )}`;
+      }
+      function securityView() {
+        const logs = (state.auditLogs || []).map((a) => ({
+          ...a,
+          details: JSON.stringify(a.details || {}),
+        }));
+        return `<div class="grid g3">${stat("Activity records", logs.length, "shield-check", "blue")}${stat("Secure access", "Enabled", "key-round", "green")}${stat("Payment alerts", "Protected", "lock", "purple")}</div><div class="quick"><button onclick="downloadBackup()">${i("download")}Download Records</button><button onclick="openOutbox()">${i("mail")}Messages</button><button onclick="processOutbox()">${i("send")}Send Messages</button><button onclick="openReadiness()">${i("check-circle")}System Status</button><button onclick="toast('Online payment setup can be enabled when payment gateway details are added')">${i("indian-rupee")}Online Payments</button></div>${cardTable("Recent Activity", "", logs, ["id", "actor", "role", "action", "details", "at"])}`;
+      }
+      function tenant() {
+        return state.tenants[0] || {};
+      }
+      function tenantHome() {
+        const t = tenant(),
+          due = state.payments.filter(
+            (p) => p.status === "pending" || p.status === "overdue",
+          ),
+          paid = state.payments
+            .filter((p) => p.status === "paid")
+            .reduce((s, p) => s + p.amount, 0);
+        return `<div class="card"><div class="card-body profile"><div class="big-av">${(t.name || "T")[0]}</div><div><h2>${t.name || currentUser.name}</h2><p>Room ${t.room || "-"} • Monthly rent ${money(t.rent)} • Joined ${t.join || "-"}</p></div><button class="btn primary" onclick="go('my-payments')">${i("indian-rupee")}Pay Rent</button></div></div>${due.length ? `<div class="notice reminder"><b>Payment reminder</b><p>${due.length} due payment pending hai. Pay Now se QR/UPI options use karke transaction ID submit karein.</p><small>Due date: ${due[0].dueDate || "-"}</small></div>` : ""}<div class="grid g3">${stat("Room", t.room || "-", "bed", "blue")}${stat("Paid amount", money(paid), "receipt", "green")}${stat("Open issues", state.complaints.filter((c) => c.status === "open").length, "alert-circle", "orange")}</div><div class="grid g2"><div class="card"><div class="card-hd"><h2>Payment History</h2></div><div class="card-body">${table(
+          state.payments.map((p) => ({
+            ...p,
+            amount: money(p.amount),
+            actions: tenantPaymentActions(p),
+          })),
+          ["month", "amount", "status", "dueDate", "actions"],
+        )}</div></div><div class="card"><div class="card-hd"><h2>Latest Notices</h2></div><div class="card-body">${state.notices.map((n) => notice(n.title, n.message, n.date)).join("")}</div></div></div>`;
+      }
+      function tenantPayments() {
+        return `<div class="card"><div class="card-hd"><h2>Admin Payment Details</h2></div><div class="card-body">${tenantPaymentSetup()}</div></div>${cardTable(
+          "Payment History",
+          "",
+          state.payments.map((p) => ({
+            ...p,
+            amount: money(p.amount),
+            actions: tenantPaymentActions(p),
+          })),
+          [
+            "id",
+            "amount",
+            "month",
+            "status",
+            "dueDate",
+            "paidAt",
+            "method",
+            "transactionId",
+            "actions",
+          ],
+        )}`;
+      }
+      function tenantComplaints() {
+        return cardTable(
+          "Complaint Timeline",
+          `<button class="btn primary" onclick="openModal('tenantComplaint')">${i("plus")}Raise Complaint</button>`,
+          state.complaints,
+          ["id", "issue", "priority", "status", "date"],
+        );
+      }
+      function tenantServices() {
+        return cardTable(
+          "Service Requests",
+          `<button class="btn primary" onclick="openModal('tenantService')">${i("plus")}Request Service</button>`,
+          state.services,
+          ["id", "type", "status", "date"],
+        );
+      }
+      function tenantNotices() {
+        return `<div class="card"><div class="card-hd"><h2>Notice Board</h2></div><div class="card-body">${state.notices.map((n) => notice(n.title, n.message, n.tag + " • " + n.date)).join("")}</div></div>`;
+      }
+      function tenantProfile() {
+        const t = tenant();
+        return `<div class="card"><div class="card-body profile"><div class="big-av">${(t.name || "T")[0]}</div><div><h2>${t.name || currentUser.name}</h2><p>Email ${t.email || currentUser.email || "-"} • Phone ${t.phone || "-"} • Aadhaar ${t.aadhaarMasked || "-"} • Room ${t.room || "-"} • Rent ${money(t.rent)} • Status ${t.status || "active"}</p></div><button class="btn secondary" onclick="toast('Profile update request sent')">${i("send")}Request Update</button></div></div>`;
+      }
+      function adminPaymentActions(p) {
+        let actions = [];
+        if (p.status === "verification_pending") {
+          actions.push(
+            `<button class="btn primary" onclick="verifyPayment('${p.id}')">${i("shield-check")}Verify</button>`,
+            `<button class="btn danger" onclick="rejectPayment('${p.id}')">${i("x-circle")}Reject</button>`,
+          );
+        }
+        if (p.status === "pending" || p.status === "overdue") {
+          actions.push(
+            `<button class="btn secondary" onclick="sendReminder('${p.id}')">${i("bell")}Remind</button>`,
+          );
+        }
+        if (p.status === "paid" || p.status === "verification_pending") {
+          actions.push(
+            `<button class="btn ghost" onclick="downloadInvoice('${p.id}')">${i("download")}Invoice</button>`,
+          );
+        }
+        return actions.join(" ");
+      }
+      function tenantPaymentActions(p) {
+        let actions = [];
+        if (p.status === "pending" || p.status === "overdue") {
+          actions.push(
+            `<button class="btn primary" onclick="openGatewayLink('${p.id}')">${i("credit-card")}Pay Online</button>`,
+            `<button class="btn secondary" onclick="openPayNow('${p.id}')">${i("qr-code")}UPI Proof</button>`,
+          );
+        }
+        if (p.status === "verification_pending") {
+          actions.push(
+            `<button class="btn secondary" onclick="downloadInvoice('${p.id}')">${i("download")}Proof Invoice</button>`,
+          );
+        }
+        if (p.status === "paid") {
+          actions.push(
+            `<button class="btn ghost" onclick="downloadInvoice('${p.id}')">${i("download")}Invoice</button>`,
+          );
+        }
+        return actions.join(" ");
+      }
+      function tenantPaymentSetup(amount = tenant().rent || 0, month = "Rent") {
+        const s = state.paymentSettings || {};
+        return `<div class="payment-box"><img class="qr" src="${qrSrc(s, amount, month)}" alt="Payment QR"><div><b>${s.businessName || "StayWise PG"}</b><p style="color:var(--muted);line-height:1.6">UPI ID: ${s.upiId || "-"}<br>Payee: ${s.payeeName || "-"}<br>Phone: ${s.phone || "-"}</p><div class="pay-options">${payButtons(amount, month)}</div><div class="invoice-note">${s.instructions || "Payment ke baad transaction ID submit karein."}</div></div></div>`;
+      }
+      function qrSrc(settings, amount, note) {
+        if (settings?.qrImage) return settings.qrImage;
+        const upi = upiLink(amount, note);
+        return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upi)}`;
+      }
+      function upiLink(amount, note) {
+        const s = state.paymentSettings || {};
+        return `upi://pay?pa=${encodeURIComponent(s.upiId || "staywise@upi")}&pn=${encodeURIComponent(s.payeeName || s.businessName || "StayWise PG")}&am=${encodeURIComponent(amount || 0)}&cu=INR&tn=${encodeURIComponent(note || "PG Rent")}`;
+      }
+      function payButtons(amount, note) {
+        return ["PhonePe", "Google Pay", "Paytm", "Any UPI"]
+          .map(
+            (name) =>
+              `<a class="btn secondary" href="${upiLink(amount, note)}">${name}</a>`,
+          )
+          .join("");
+      }
+      function openPayNow(id) {
+        const p = state.payments.find((x) => x.id === id),
+          s = state.paymentSettings || {};
+        modalTitle.textContent = `Pay ${p.month}`;
+        modalBody.innerHTML = `${tenantPaymentSetup(p.amount, p.month)}<div class="field"><label>Paid From</label><select id="m_method"><option>PhonePe</option><option>Google Pay</option><option>Paytm</option><option>BHIM UPI</option><option>Bank Transfer</option><option>Cash</option></select></div><div class="field"><label>Transaction ID / UTR</label><input id="m_txn" placeholder="Example: UPI123456789"></div><div class="field"><label>Note for admin</label><textarea id="m_note" rows="3" placeholder="Screenshot/reference details"></textarea></div><div class="invoice-note">Amount ${money(p.amount)} admin account ${s.upiId || "-"} par bhejne ke baad transaction ID submit karein. Admin verify karega, tab status paid hoga.</div>`;
+        modalActions.innerHTML = `<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="submitPayment('${p.id}')">${i("send")}Submit for Verification</button>`;
+        modalWrap.classList.add("open");
+        lucide.createIcons();
+      }
+      async function submitPayment(id) {
+        try {
+          await api(`/api/payments/${encodeURIComponent(id)}/submit`, {
+            method: "POST",
+            body: JSON.stringify({
+              method: val("m_method"),
+              transactionId: val("m_txn"),
+              payerNote: val("m_note"),
+            }),
+          });
+          closeModal();
+          await loadSilent();
+          toast("Payment proof sent to admin");
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function verifyPayment(id) {
+        try {
+          await api(`/api/payments/${encodeURIComponent(id)}/verify`, {
+            method: "PATCH",
+            body: "{}",
+          });
+          await loadSilent();
+          toast("Payment verified as paid");
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function rejectPayment(id) {
+        const reason = prompt(
+          "Reject reason?",
+          "Transaction not found in account statement",
+        );
+        try {
+          await api(`/api/payments/${encodeURIComponent(id)}/reject`, {
+            method: "PATCH",
+            body: JSON.stringify({ reason: reason || "Rejected by admin" }),
+          });
+          await loadSilent();
+          toast("Payment proof rejected");
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function sendReminder(id) {
+        try {
+          await api(`/api/payments/${encodeURIComponent(id)}/remind`, {
+            method: "POST",
+            body: "{}",
+          });
+          await loadSilent();
+          toast("Reminder marked for tenant");
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function openGatewayLink(id) {
+        try {
+          const link = await api(
+            `/api/payments/${encodeURIComponent(id)}/gateway-link`,
+            { method: "POST", body: "{}" },
+          );
+          if (link.checkoutUrl) {
+            window.open(link.checkoutUrl, "_blank", "noopener");
+            toast("Secure payment link opened");
+            return;
+          }
+          toast(
+            link.message || "Gateway is not configured; use UPI proof flow",
+          );
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      function openPaymentSettings() {
+        const s = state.paymentSettings || {};
+        modalTitle.textContent = "Payment QR / UPI Setup";
+        modalBody.innerHTML = `<div class="field"><label>Business Name</label><input id="m_business" value="${s.businessName || ""}"></div><div class="field"><label>UPI ID</label><input id="m_upi" value="${s.upiId || ""}" placeholder="yourname@upi"></div><div class="field"><label>Payee Name</label><input id="m_payee" value="${s.payeeName || ""}"></div><div class="field"><label>Phone</label><input id="m_phone" value="${s.phone || ""}"></div><div class="field"><label>Upload QR Image</label><input id="m_qr_file" type="file" accept="image/*" onchange="previewQrUpload(this)"></div><div class="payment-box"><img class="qr" id="m_qr_preview" src="${qrSrc(s, 9500, "Rent")}" alt="QR preview"><div class="invoice-note">Admin yahan apna PhonePe, Paytm, Google Pay ya bank UPI QR upload kar sakta hai. Upload ke baad tenants ko wahi QR dikhega.</div></div><div class="field"><label>QR Image URL optional</label><input id="m_qr" value="${s.qrImage || ""}" placeholder="Paste custom QR image URL"></div><div class="field"><label>Instructions</label><textarea id="m_inst" rows="4">${s.instructions || ""}</textarea></div>`;
+        modalActions.innerHTML = `<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="savePaymentSettings()">${i("save")}Save</button>`;
+        modalWrap.classList.add("open");
+        lucide.createIcons();
+      }
+      function previewQrUpload(input) {
+        const file = input.files?.[0];
+        if (!file) return;
+        if (file.size > 2_500_000) {
+          toast("QR image 2.5MB se chhota rakhein");
+          input.value = "";
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          document.getElementById("m_qr").value = reader.result;
+          document.getElementById("m_qr_preview").src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      }
+      async function savePaymentSettings() {
+        try {
+          await api("/api/payment-settings", {
+            method: "PATCH",
+            body: JSON.stringify({
+              businessName: val("m_business"),
+              upiId: val("m_upi"),
+              payeeName: val("m_payee"),
+              phone: val("m_phone"),
+              qrImage: val("m_qr"),
+              instructions: val("m_inst"),
+            }),
+          });
+          closeModal();
+          await loadSilent();
+          toast("Payment settings updated");
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      function openChangePassword() {
+        modalTitle.textContent = "Change Password";
+        modalBody.innerHTML = `<div class="field"><label>Current Password</label><input id="m_current_pass" type="password"></div><div class="field"><label>New Password</label><input id="m_new_pass" type="password" placeholder="Minimum 10 characters"></div>`;
+        modalActions.innerHTML = `<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="changePassword()">${i("key-round")}Update Password</button>`;
+        modalWrap.classList.add("open");
+        lucide.createIcons();
+      }
+      async function changePassword() {
+        try {
+          await api("/api/auth/change-password", {
+            method: "POST",
+            body: JSON.stringify({
+              currentPassword: val("m_current_pass"),
+              newPassword: val("m_new_pass"),
+            }),
+          });
+          closeModal();
+          toast("Password updated");
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function downloadBackup() {
+        try {
+          const res = await fetch("/api/admin/backup", {
+            credentials: "same-origin",
+          });
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || "Backup failed");
+          }
+          const blob = await res.blob();
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = `staywise-backup-${Date.now()}.json`;
+          link.click();
+          URL.revokeObjectURL(link.href);
+          toast("Backup downloaded");
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function openOutbox() {
+        try {
+          const rows = await api("/api/admin/outbox");
+          modalTitle.textContent = "Messages";
+          modalBody.innerHTML = `<div style="overflow:auto">${table(
+            rows.map((x) => ({
+              ...x,
+              preview: x.previewUrl
+                ? `<a href="${x.previewUrl}" target="_blank" rel="noopener">Open</a>`
+                : "-",
+              meta: JSON.stringify(x.meta || {}),
+            })),
+            [
+              "id",
+              "type",
+              "to",
+              "subject",
+              "status",
+              "createdAt",
+              "preview",
+              "meta",
+            ],
+          )}</div>`;
+          modalActions.innerHTML = `<button class="btn primary" onclick="closeModal()">Done</button>`;
+          modalWrap.classList.add("open");
+          lucide.createIcons();
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function processOutbox() {
+        try {
+          const r = await api("/api/admin/outbox/process", {
+            method: "POST",
+            body: "{}",
+          });
+          toast(`Processed ${r.processed}, sent ${r.sent}`);
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function openReadiness() {
+        try {
+          const r = await api("/api/admin/readiness");
+          modalTitle.textContent = "System Status";
+          const rows = [
+            ["Secure website", r.httpsConfigured],
+            ["Records connected", r.mongoConfigured],
+            ["Payment safety", r.paymentWebhookConfigured],
+            ["Online payment links", r.razorpayConfigured],
+            ["Email service", r.smtpConfigured],
+            ["SMS or WhatsApp", r.twilioConfigured || r.smsWebhookConfigured],
+            ["Image uploads", r.cloudinaryConfigured || r.s3Configured],
+            ["Daily backups", Number(r.backupIntervalHours) > 0],
+          ].map(([item, ready]) => ({
+            item,
+            status: ready ? "Ready" : "Not set",
+          }));
+          modalBody.innerHTML = `<div style="overflow:auto">${table(rows, ["item", "status"])}</div>`;
+          modalActions.innerHTML = `<button class="btn primary" onclick="closeModal()">Done</button>`;
+          modalWrap.classList.add("open");
+          lucide.createIcons();
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function resetTenantPassword(id) {
+        try {
+          const data = await api(
+            `/api/tenants/${encodeURIComponent(id)}/reset-password`,
+            { method: "POST", body: "{}" },
+          );
+          modalTitle.textContent = "Temporary Password";
+          modalBody.innerHTML = `<div class="invoice-note">Tenant temporary password:<br><b style="font-size:18px">${data.temporaryPassword}</b><br>Ye outbox me bhi queue ho gaya hai. Tenant ko privately share karein aur login ke baad password change karwayen.</div>`;
+          modalActions.innerHTML = `<button class="btn primary" onclick="closeModal()">Done</button>`;
+          modalWrap.classList.add("open");
+          lucide.createIcons();
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function verifyTenant(id) {
+        try {
+          await patchRow("tenants", id, {
+            proofStatus: "verified",
+            status: "active",
+            verifiedAt: today(),
+          });
+          toast("Tenant proof verified");
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function downloadInvoice(id) {
+        try {
+          const invoice = await api(
+            `/api/payments/${encodeURIComponent(id)}/invoice`,
+          );
+          const html = invoiceHtml(invoice);
+          const blob = new Blob([html], { type: "text/html" });
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = `${invoice.invoiceNo}.html`;
+          link.click();
+          URL.revokeObjectURL(link.href);
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      function invoiceHtml(x) {
+        return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${x.invoiceNo}</title><style>*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#111827;padding:24px;margin:0}.box{max-width:760px;margin:auto;border:1px solid #ddd;padding:24px}.top{display:flex;justify-content:space-between;gap:16px;border-bottom:2px solid #111827;padding-bottom:16px}.paid{color:#15803d}.pending{color:#b7791f}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}.item{padding:12px;background:#f8fafc;min-width:0}.label{font-size:12px;color:#667085;text-transform:uppercase}.value{font-weight:700;margin-top:4px;overflow-wrap:anywhere}.foot{margin-top:24px;color:#667085;font-size:13px;line-height:1.5}@media(max-width:620px){body{padding:10px}.box{padding:16px}.top,.row{grid-template-columns:1fr;display:grid}.top h1,.top h2{margin:0 0 8px}}</style></head><body><div class="box"><div class="top"><div><h1>${x.businessName}</h1><p>UPI: ${x.upiId || "-"}</p></div><div><h2>${x.invoiceNo}</h2><b class="${x.status === "paid" ? "paid" : "pending"}">${x.status.replace("_", " ").toUpperCase()}</b></div></div><div class="row">${Object.entries(
+          {
+            Tenant: x.tenant,
+            Room: x.room,
+            Phone: x.phone,
+            Email: x.email,
+            Month: x.month,
+            Amount: money(x.amount),
+            "Due Date": x.dueDate,
+            "Paid At": x.paidAt,
+            Method: x.method,
+            "Transaction ID": x.transactionId,
+            "Verified By": x.verifiedBy,
+            "Verified At": x.verifiedAt,
+          },
+        )
+          .map(
+            ([k, v]) =>
+              `<div class="item"><div class="label">${k}</div><div class="value">${v || "-"}</div></div>`,
+          )
+          .join(
+            "",
+          )}</div><div class="foot">Generated at ${x.generatedAt}. Verification pending invoice is payment proof only; final receipt is valid after admin verification.</div></div></body></html>`;
+      }
+      function table(rows, cols) {
+        if (!rows.length) return empty("No records found");
+        return `<table><thead><tr>${cols.map((c) => `<th>${labelize(c)}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${cols.map((c) => `<td data-label="${labelize(c)}">${cell(r[c])}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+      }
+      function labelize(key) {
+        return String(key)
+          .replace(/([A-Z])/g, " $1")
+          .replace(/_/g, " ")
+          .replace(/^./, (c) => c.toUpperCase());
+      }
+      function cardTable(h, action, rows, cols) {
+        return `<div class="card"><div class="card-hd"><h2>${h}</h2><div class="row-actions">${action}</div></div><div class="card-body" style="overflow:auto">${table(rows, cols)}</div></div>`;
+      }
+      function cell(v) {
+        const s = String(v ?? "");
+        return [
+          "paid",
+          "pending",
+          "overdue",
+          "verification_pending",
+          "open",
+          "resolved",
+          "occupied",
+          "vacant",
+          "maintenance",
+          "active",
+          "low",
+          "ok",
+          "completed",
+        ].includes(s)
+          ? `<span class="badge ${s}">${s.replace("_", " ")}</span>`
+          : s;
+      }
+      function notice(a, b, c) {
+        return `<div class="notice"><b>${a}</b><p>${b}</p><small>${c}</small></div>`;
+      }
+      function empty(s) {
+        return `<div class="empty">${s}</div>`;
+      }
+      function opts(rows, label = "name") {
+        return rows.map((r) => `<option>${r[label]}</option>`).join("");
+      }
+      const forms = {
+        tenant: [
+          "Add Tenant",
+          () =>
+            `<div class="field"><label>Name</label><input id="m_name"></div><div class="field"><label>Phone</label><input id="m_phone" inputmode="numeric" maxlength="10"></div><div class="field"><label>Email</label><input id="m_email" type="email"></div><div class="field"><label>Aadhaar Number</label><input id="m_aadhaar" inputmode="numeric" maxlength="12"></div><div class="field"><label>Room</label><select id="m_room">${opts(state.rooms, "num")}</select></div><div class="field"><label>Rent</label><input id="m_rent" type="number" value="9000"></div>`,
+          () =>
+            createRow("tenants", {
+              name: val("m_name") || "New Tenant",
+              phone: val("m_phone") || "9999999999",
+              email: val("m_email") || "",
+              aadhaar: val("m_aadhaar"),
+              room: val("m_room"),
+              rent: +val("m_rent") || 9000,
+              status: "active",
+              proofStatus: "verified",
+              join: today(),
+            }),
+        ],
+        room: [
+          "Add Room",
+          () =>
+            `<div class="field"><label>Room No.</label><input id="m_num"></div><div class="field"><label>Type</label><select id="m_type"><option>Single</option><option>Double</option><option>Triple</option></select></div><div class="field"><label>Floor</label><input id="m_floor" value="1"></div><div class="field"><label>Status</label><select id="m_status"><option>vacant</option><option>occupied</option><option>maintenance</option></select></div>`,
+          () =>
+            createRow("rooms", {
+              num: val("m_num"),
+              type: val("m_type"),
+              floor: val("m_floor"),
+              status: val("m_status"),
+            }),
+        ],
+        payment: [
+          "New Payment",
+          () =>
+            `<div class="field"><label>Tenant</label><select id="m_tenant">${opts(state.tenants)}</select></div><div class="field"><label>Amount</label><input id="m_amount" type="number" value="9000"></div><div class="field"><label>Month</label><input id="m_month" value="Jun 2026"></div><div class="field"><label>Status</label><select id="m_status"><option>paid</option><option>pending</option><option>overdue</option></select></div>`,
+          () => {
+            let t = state.tenants.find((x) => x.name === val("m_tenant"));
+            return createRow("payments", {
+              tenant: t.name,
+              room: t.room,
+              amount: +val("m_amount") || 0,
+              month: val("m_month"),
+              status: val("m_status"),
+              date: val("m_status") === "paid" ? today() : "-",
+            });
+          },
+        ],
+        complaint: [
+          "Log Complaint",
+          () =>
+            `<div class="field"><label>Tenant</label><select id="m_tenant">${opts(state.tenants)}</select></div><div class="field"><label>Issue</label><textarea id="m_issue" rows="4"></textarea></div><div class="field"><label>Priority</label><select id="m_priority"><option>High</option><option>Medium</option><option>Low</option></select></div>`,
+          () =>
+            createRow("complaints", {
+              tenant: val("m_tenant"),
+              issue: val("m_issue") || "General issue",
+              priority: val("m_priority"),
+              status: "open",
+              date: today(),
+            }),
+        ],
+        notice: [
+          "Post Notice",
+          () =>
+            `<div class="field"><label>Title</label><input id="m_title"></div><div class="field"><label>Message</label><textarea id="m_msg" rows="4"></textarea></div><div class="field"><label>Tag</label><select id="m_tag"><option>Important</option><option>Finance</option><option>Maintenance</option><option>Event</option></select></div>`,
+          () =>
+            createRow("notices", {
+              title: val("m_title") || "Notice",
+              message: val("m_msg") || "Details will be shared soon.",
+              tag: val("m_tag"),
+              date: today(),
+            }),
+        ],
+        service: [
+          "New Service Request",
+          () =>
+            `<div class="field"><label>Tenant</label><select id="m_tenant">${opts(state.tenants)}</select></div><div class="field"><label>Service</label><select id="m_type"><option>Laundry</option><option>Room Cleaning</option><option>Plumbing</option><option>Electrician</option></select></div>`,
+          () =>
+            createRow("services", {
+              tenant: val("m_tenant"),
+              type: val("m_type"),
+              status: "pending",
+              date: today(),
+            }),
+        ],
+        staff: [
+          "Add Staff",
+          () =>
+            `<div class="field"><label>Name</label><input id="m_name"></div><div class="field"><label>Role</label><input id="m_role"></div><div class="field"><label>Phone</label><input id="m_phone"></div><div class="field"><label>Shift</label><select id="m_shift"><option>Morning</option><option>Evening</option><option>Night</option></select></div>`,
+          () =>
+            createRow("staff", {
+              name: val("m_name") || "Staff Member",
+              role: val("m_role") || "Support",
+              phone: val("m_phone") || "9000000000",
+              shift: val("m_shift"),
+            }),
+        ],
+        inventory: [
+          "Add Inventory",
+          () =>
+            `<div class="field"><label>Item</label><input id="m_item"></div><div class="field"><label>Stock</label><input id="m_stock" type="number"></div><div class="field"><label>Minimum Stock</label><input id="m_min" type="number"></div>`,
+          () =>
+            createRow("inventory", {
+              item: val("m_item") || "Item",
+              stock: +val("m_stock") || 0,
+              min: +val("m_min") || 0,
+            }),
+        ],
+        expense: [
+          "Add Expense",
+          () =>
+            `<div class="field"><label>Category</label><input id="m_cat"></div><div class="field"><label>Amount</label><input id="m_amount" type="number"></div>`,
+          () =>
+            createRow("expenses", {
+              category: val("m_cat") || "Expense",
+              amount: +val("m_amount") || 0,
+              date: today(),
+            }),
+        ],
+        tenantComplaint: [
+          "Raise Complaint",
+          () =>
+            `<div class="field"><label>Issue</label><textarea id="m_issue" rows="4"></textarea></div><div class="field"><label>Priority</label><select id="m_priority"><option>High</option><option>Medium</option><option>Low</option></select></div>`,
+          () =>
+            createRow("complaints", {
+              tenant: tenant().name,
+              issue: val("m_issue") || "Resident issue",
+              priority: val("m_priority"),
+              status: "open",
+              date: today(),
+            }),
+        ],
+        tenantService: [
+          "Request Service",
+          () =>
+            `<div class="field"><label>Service</label><select id="m_type"><option>Laundry</option><option>Room Cleaning</option><option>Plumbing</option><option>Electrician</option></select></div>`,
+          () =>
+            createRow("services", {
+              tenant: tenant().name,
+              type: val("m_type"),
+              status: "pending",
+              date: today(),
+            }),
+        ],
+      };
+      forms.payment = [
+        "New Payment Due",
+        () =>
+          `<div class="field"><label>Tenant</label><select id="m_tenant">${opts(state.tenants)}</select></div><div class="field"><label>Amount</label><input id="m_amount" type="number" value="9000"></div><div class="field"><label>Month</label><input id="m_month" value="Jun 2026"></div><div class="field"><label>Due Date</label><input id="m_due" value="07 Jun 2026"></div><div class="field"><label>Status</label><select id="m_status"><option>pending</option><option>overdue</option></select></div>`,
+        () => {
+          let t = state.tenants.find((x) => x.name === val("m_tenant"));
+          return createRow("payments", {
+            tenant: t.name,
+            room: t.room,
+            amount: +val("m_amount") || 0,
+            month: val("m_month"),
+            dueDate: val("m_due"),
+            status: val("m_status"),
+            date: "-",
+          });
+        },
+      ];
+      function openModal(type) {
+        const f = forms[type];
+        modalTitle.textContent = f[0];
+        modalBody.innerHTML = f[1]();
+        modalActions.innerHTML = `<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="modalAction()">${i("check")}Save</button>`;
+        modalAction = f[2];
+        modalWrap.classList.add("open");
+        lucide.createIcons();
+      }
+      function closeModal(e) {
+        if (e && e.target.id !== "modalWrap") return;
+        modalWrap.classList.remove("open");
+      }
+      function val(id) {
+        return document.getElementById(id)?.value?.trim() || "";
+      }
+      async function createRow(collection, payload) {
+        try {
+          await api(`/api/${collection}`, {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+          closeModal();
+          await loadSilent();
+          toast("Saved successfully");
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function patchRow(collection, id, payload) {
+        try {
+          await api(`/api/${collection}/${encodeURIComponent(id)}`, {
+            method: "PATCH",
+            body: JSON.stringify(payload),
+          });
+          await loadSilent();
+          toast("Updated successfully");
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function removeRow(collection, id) {
+        try {
+          await api(`/api/${collection}/${encodeURIComponent(id)}`, {
+            method: "DELETE",
+          });
+          await loadSilent();
+          toast("Removed successfully");
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+      async function loadSilent() {
+        const data = await api("/api/bootstrap");
+        currentUser = data.user;
+        state = data.data;
+        buildNav();
+        render();
+      }
+      function toast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2300);
+      }
+      password.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") login();
+      });
+      email.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") login();
+      });
+      setRole("admin");
+      loadData(false).catch(() => checkServer());
+      lucide.createIcons();
+    </script>
+  </body>
 </html>
-

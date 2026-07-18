@@ -511,6 +511,24 @@ function validEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || ""));
 }
 
+function digitsOnly(value) {
+  return String(value || "").replace(/\D/g, "");
+}
+
+function hashProof(value) {
+  return crypto.createHash("sha256").update(String(value)).digest("hex");
+}
+
+function aadhaarProof(value) {
+  const digits = digitsOnly(value);
+  if (!/^\d{12}$/.test(digits)) return null;
+  return {
+    aadhaarLast4: digits.slice(-4),
+    aadhaarMasked: `XXXX-XXXX-${digits.slice(-4)}`,
+    aadhaarHash: hashProof(digits)
+  };
+}
+
 function isAllowed(value, allowed) {
   return allowed.includes(String(value || ""));
 }
@@ -519,7 +537,8 @@ function validateRecord(collection, row) {
   if (collection === "tenants") {
     if (!row.name) return "Tenant name is required";
     if (row.email && !validEmail(row.email)) return "Valid tenant email is required";
-    if (row.phone && !/^\d{10}$/.test(String(row.phone))) return "Valid 10-digit phone is required";
+    if (row.phone && !/^\d{10}$/.test(digitsOnly(row.phone))) return "Valid 10-digit phone is required";
+    if (row.aadhaarLast4 && !/^\d{4}$/.test(String(row.aadhaarLast4))) return "Valid Aadhaar proof is required";
     if (row.rent !== undefined && Number(row.rent) < 0) return "Rent must be positive";
   }
   if (collection === "rooms" && !row.num) return "Room number is required";
@@ -649,6 +668,11 @@ function publicUser(user) {
   return { id: user.id, role: user.role, name: user.name, email: user.email, meta: user.meta, permissions: permissionsFor(user), passwordResetRequired: Boolean(user.passwordResetRequired) };
 }
 
+function publicTenant(tenant) {
+  const { aadhaarHash, ...safeTenant } = tenant || {};
+  return safeTenant;
+}
+
 function tenantScopedDb(db, user) {
   if (can(user, "*")) {
     const { users, errorLogs, sessions, security, outbox, ...safeDb } = db;
@@ -657,12 +681,13 @@ function tenantScopedDb(db, user) {
     delete safeDb.sessions;
     delete safeDb.security;
     delete safeDb.outbox;
+    safeDb.tenants = (safeDb.tenants || []).map(publicTenant);
     safeDb.auditLogs = (safeDb.auditLogs || []).slice(0, 100);
     return safeDb;
   }
   if (user.role !== "tenant") {
     const scoped = {
-      tenants: can(user, "tenants:read") ? db.tenants : [],
+      tenants: can(user, "tenants:read") ? (db.tenants || []).map(publicTenant) : [],
       rooms: can(user, "rooms:read") ? db.rooms : [],
       payments: can(user, "payments:read") ? db.payments : [],
       paymentSettings: can(user, "paymentSettings:read") || can(user, "payments:read") ? db.paymentSettings : {},
@@ -693,7 +718,7 @@ function tenantScopedDb(db, user) {
   }
   const name = tenant?.name || user.name;
   return {
-    tenants: tenant ? [tenant] : [],
+    tenants: tenant ? [publicTenant(tenant)] : [],
     rooms: tenant ? db.rooms.filter(room => room.num === tenant.room) : [],
     payments: db.payments.filter(item => item.tenant === name),
     paymentSettings: db.paymentSettings,
@@ -865,6 +890,55 @@ function assertProductionReady() {
 }
 
 async function handleApi(req, res, url) {
+  if (url.pathname === "/api/auth/register" && req.method === "POST") {
+    const body = sanitizeValue(await parseBody(req));
+    const name = String(body.name || "").trim();
+    const email = String(body.email || "").toLowerCase();
+    const phone = digitsOnly(body.phone);
+    const proof = aadhaarProof(body.aadhaar);
+    const password = String(body.password || "");
+    if (!name) return send(res, 400, { error: "Name is required" });
+    if (!validEmail(email)) return send(res, 400, { error: "Valid email is required" });
+    if (!/^\d{10}$/.test(phone)) return send(res, 400, { error: "Valid 10-digit phone is required" });
+    if (!proof) return send(res, 400, { error: "Valid 12-digit Aadhaar number is required" });
+    if (password.length < 10) return send(res, 400, { error: "Password must be at least 10 characters" });
+
+    const db = await readDb();
+    db.tenants ||= [];
+    db.users ||= [];
+    if (db.users.some(user => user.email === email) || db.tenants.some(tenant => String(tenant.email || "").toLowerCase() === email)) {
+      return send(res, 409, { error: "This email is already registered" });
+    }
+    if (db.tenants.some(tenant => digitsOnly(tenant.phone) === phone)) {
+      return send(res, 409, { error: "This phone number is already registered" });
+    }
+    if (db.tenants.some(tenant => tenant.aadhaarHash && tenant.aadhaarHash === proof.aadhaarHash)) {
+      return send(res, 409, { error: "This Aadhaar proof is already registered" });
+    }
+
+    const tenant = {
+      id: nextId("T", db.tenants),
+      name,
+      email,
+      phone,
+      room: "",
+      rent: 0,
+      status: "verification_pending",
+      join: today(),
+      proofStatus: "pending",
+      registeredAt: nowStamp(),
+      ...proof
+    };
+    const error = validateRecord("tenants", tenant);
+    if (error) return send(res, 400, { error });
+    db.tenants.push(tenant);
+    db.users.push(seedUser(nextId("U", db.users), "tenant", name, email, password, "Registration pending"));
+    enqueueNotifications(db, { email, phone }, "StayWise registration received", "Your PG registration has been saved. Admin will verify your proof and assign room details.", { tenantId: tenant.id });
+    audit(db, { email, role: "tenant" }, "tenant_registered", { tenantId: tenant.id });
+    await writeDb(db);
+    return send(res, 201, { ok: true, tenant: { id: tenant.id, name: tenant.name, email: tenant.email, phone: tenant.phone, status: tenant.status, proofStatus: tenant.proofStatus, aadhaarMasked: tenant.aadhaarMasked } });
+  }
+
   if (url.pathname === "/api/auth/login" && req.method === "POST") {
     const body = sanitizeValue(await parseBody(req));
     const db = await readDb();
@@ -1210,6 +1284,20 @@ async function handleApi(req, res, url) {
     const row = { ...body };
     let temporaryPassword = "";
     if (row.email) row.email = String(row.email).toLowerCase();
+    if (collection === "tenants") {
+      if (row.phone) row.phone = digitsOnly(row.phone);
+      if (row.aadhaar) {
+        const proof = aadhaarProof(row.aadhaar);
+        if (!proof) return send(res, 400, { error: "Valid 12-digit Aadhaar number is required" });
+        if (rows.some(tenant => tenant.aadhaarHash && tenant.aadhaarHash === proof.aadhaarHash)) {
+          return send(res, 409, { error: "This Aadhaar proof is already registered" });
+        }
+        Object.assign(row, proof, { proofStatus: row.proofStatus || "pending" });
+        delete row.aadhaar;
+      }
+      if (row.email && rows.some(tenant => String(tenant.email || "").toLowerCase() === row.email)) return send(res, 409, { error: "This email is already registered" });
+      if (row.phone && rows.some(tenant => digitsOnly(tenant.phone) === row.phone)) return send(res, 409, { error: "This phone number is already registered" });
+    }
     if (collection === "tenants" && row.email && !validEmail(row.email)) return send(res, 400, { error: "Valid tenant email is required" });
     if (collection !== "rooms" && !row.id) row.id = nextId(prefixFor(collection), rows);
     if (collection === "rooms" && !row.num) return send(res, 400, { error: "Room number is required" });
@@ -1244,6 +1332,19 @@ async function handleApi(req, res, url) {
 
   if (req.method === "PATCH") {
     const body = sanitizeValue(await parseBody(req));
+    if (collection === "tenants") {
+      if (body.email) body.email = String(body.email).toLowerCase();
+      if (body.phone) body.phone = digitsOnly(body.phone);
+      if (body.aadhaar) {
+        const proof = aadhaarProof(body.aadhaar);
+        if (!proof) return send(res, 400, { error: "Valid 12-digit Aadhaar number is required" });
+        if (rows.some((tenant, tenantIndex) => tenantIndex !== index && tenant.aadhaarHash && tenant.aadhaarHash === proof.aadhaarHash)) {
+          return send(res, 409, { error: "This Aadhaar proof is already registered" });
+        }
+        Object.assign(body, proof);
+        delete body.aadhaar;
+      }
+    }
     const row = recalculateInventoryStatus({ ...rows[index], ...body });
     if (collection === "payments" && row.status === "paid" && row.date === "-") row.date = today();
     const error = validateRecord(collection, row);
