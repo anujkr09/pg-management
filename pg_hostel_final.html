@@ -45,7 +45,8 @@ html{scroll-behavior:smooth}body{overflow-x:hidden}.btn,.icon-btn,.nav button,.q
     <div class="roles"><button class="active" id="adminRole" onclick="setRole('admin')">Admin</button><button id="tenantRole" onclick="setRole('tenant')">Tenant</button></div>
     <div class="field"><label>Email</label><input id="email" type="email" value="admin@staywise.in"></div>
     <div class="field"><label>Password</label><input id="password" type="password" placeholder="Enter password"></div>
-    <div class="login-actions"><button class="btn primary" onclick="login()"><i data-lucide="log-in"></i>Login</button><button class="btn secondary" onclick="demoLogin()"><i data-lucide="sparkles"></i>Demo</button></div>
+    <div class="login-actions"><button class="btn primary" id="loginBtn" onclick="login()"><i data-lucide="log-in"></i>Login</button><button class="btn secondary" onclick="checkServer()"><i data-lucide="activity"></i>Check Server</button></div>
+    <div id="loginStatus" style="margin-top:12px;color:#667085;font-size:13px;line-height:1.5;min-height:20px"></div>
   </div>
   <div class="hero"><div><h2>Manage rooms, rent, services, people and reports from one live system.</h2><p>Every action goes through the backend and is saved in the project database.</p><div class="hero-metrics"><div><b>API</b><span>Dynamic backend</span></div><div><b>JSON DB</b><span>Persistent records</span></div><div><b>2 Portals</b><span>Admin and tenant</span></div></div></div></div>
 </section>
@@ -85,9 +86,10 @@ function i(name){return `<i data-lucide="${name}" width="18"></i>`}
 function money(n){return "₹"+Number(n||0).toLocaleString("en-IN")}
 function today(){return new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}
 function setRole(r){role=r;adminRole.classList.toggle("active",r==="admin");tenantRole.classList.toggle("active",r==="tenant");email.value=r==="admin"?"admin@staywise.in":"rahul@staywise.in";password.value="";lucide.createIcons()}
-async function api(path,opts={}){const res=await fetch(path,{...opts,credentials:"same-origin",headers:{"Content-Type":"application/json",...(opts.headers||{})}});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||"Request failed");return data}
-async function login(){try{const data=await api("/api/auth/login",{method:"POST",body:JSON.stringify({role,email:email.value.trim(),password:password.value})});boot(data)}catch(err){toast(err.message)}}
-function demoLogin(){login()}
+function setLoginStatus(msg,type=""){loginStatus.textContent=msg;loginStatus.style.color=type==="error"?"#c2410c":type==="ok"?"#15803d":"#667085";loginStatus.style.fontWeight=type?"800":"400"}
+async function api(path,opts={}){try{const res=await fetch(path,{...opts,credentials:"same-origin",headers:{"Content-Type":"application/json",...(opts.headers||{})}});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||"Request failed");return data}catch(err){if(location.protocol==="file:")throw new Error("App ko file se nahi, npm start ke baad http://localhost:3002 se open karein");if(err instanceof TypeError)throw new Error("Backend server nahi chal raha. npm start run karke phir login karein");throw err}}
+async function login(){try{setLoginStatus("Logging in...");loginBtn.disabled=true;const data=await api("/api/auth/login",{method:"POST",body:JSON.stringify({role,email:email.value.trim(),password:password.value})});setLoginStatus("");boot(data)}catch(err){setLoginStatus(err.message,"error");toast(err.message)}finally{loginBtn.disabled=false}}
+async function checkServer(){try{await api("/api/bootstrap");setLoginStatus("Server connected. Already logged in.","ok")}catch(err){setLoginStatus(err.message==="Login required"?"Server connected. Enter password to login.":err.message,err.message==="Login required"?"ok":"error")}}
 async function logout(){try{await api("/api/auth/logout",{method:"POST"})}catch{}appScreen.classList.add("hidden");loginScreen.classList.remove("hidden")}
 async function loadData(showToast=true){try{const data=await api("/api/bootstrap");boot(data,false);if(showToast)toast("Data refreshed")}catch(err){if(showToast)toast(err.message);throw err}}
 function boot(data,show=true){currentUser=data.user;role=currentUser.role;state=data.data;page=role==="tenant"?"home":(visibleNav()[0]?.[0]||"dashboard");loginScreen.classList.add("hidden");appScreen.classList.remove("hidden");avatar.textContent=currentUser.name[0];userName.textContent=currentUser.name;userMeta.textContent=currentUser.meta;roleLabel.textContent=role==="tenant"?"Tenant Portal":`${role[0].toUpperCase()+role.slice(1)} Console`;buildNav();render();if(show)toast("Login successful");if(currentUser.passwordResetRequired)setTimeout(()=>{openChangePassword();toast("Please change temporary password")},400)}
@@ -157,7 +159,7 @@ async function patchRow(collection,id,payload){try{await api(`/api/${collection}
 async function removeRow(collection,id){try{await api(`/api/${collection}/${encodeURIComponent(id)}`,{method:"DELETE"});await loadSilent();toast("Removed successfully")}catch(err){toast(err.message)}}
 async function loadSilent(){const data=await api("/api/bootstrap");currentUser=data.user;state=data.data;buildNav();render()}
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2300)}
-setRole("admin");loadData(false).catch(()=>{});lucide.createIcons();
+password.addEventListener("keydown",e=>{if(e.key==="Enter")login()});email.addEventListener("keydown",e=>{if(e.key==="Enter")login()});setRole("admin");loadData(false).catch(()=>checkServer());lucide.createIcons();
 </script>
 </body>
 </html>

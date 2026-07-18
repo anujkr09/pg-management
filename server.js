@@ -19,7 +19,7 @@ const sessionTtlMs = Number(process.env.SESSION_TTL_MINUTES || 120) * 60 * 1000;
 const loginWindowMs = Number(process.env.LOGIN_WINDOW_MINUTES || 15) * 60 * 1000;
 const maxLoginAttempts = Number(process.env.LOGIN_MAX_ATTEMPTS || 8);
 const isProduction = process.env.NODE_ENV === "production";
-const publicBaseUrl = String(process.env.PUBLIC_BASE_URL || `http://localhost:${port}`).replace(/\/$/, "");
+const publicBaseUrl = String(process.env.PUBLIC_BASE_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${port}`).replace(/\/$/, "");
 const collections = new Set(["tenants", "rooms", "payments", "complaints", "notices", "services", "staff", "inventory", "expenses", "paymentSettings"]);
 const rolePermissions = {
   owner: ["*"],
