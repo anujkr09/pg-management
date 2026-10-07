@@ -1423,14 +1423,10 @@
       async function checkServer() {
         try {
           await api("/api/bootstrap");
-          setLoginStatus("Server connected. Already logged in.", "ok");
+          setLoginStatus("");
         } catch (err) {
-          setLoginStatus(
-            err.message === "Login required"
-              ? "Server connected. Enter password to login."
-              : err.message,
-            err.message === "Login required" ? "ok" : "error",
-          );
+          if (err.message === "Login required") setLoginStatus("");
+          else setLoginStatus(err.message, "error");
         }
       }
       async function logout() {
