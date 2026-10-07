@@ -58,11 +58,17 @@
         background: #0d1b2a;
       }
       .login-panel {
-        background: white;
-        padding: 42px;
+        padding: clamp(32px, 5vw, 72px);
         display: flex;
         flex-direction: column;
         justify-content: center;
+        background:
+          radial-gradient(
+            circle at 0% 0%,
+            rgba(15, 118, 110, 0.08),
+            transparent 38%
+          ),
+          #fff;
       }
       .brand {
         display: flex;
@@ -73,11 +79,12 @@
       .logo {
         width: 44px;
         height: 44px;
-        border-radius: 8px;
+        border-radius: 13px;
         background: linear-gradient(135deg, var(--brand), var(--blue));
         display: grid;
         place-items: center;
         color: white;
+        box-shadow: 0 8px 18px rgba(15, 118, 110, 0.2);
       }
       .brand strong {
         display: block;
@@ -107,16 +114,20 @@
         gap: 8px;
         background: var(--soft);
         padding: 5px;
-        border-radius: 8px;
+        border-radius: 12px;
         margin-bottom: 18px;
       }
       .roles button {
         border: 0;
         background: transparent;
-        border-radius: 6px;
+        border-radius: 9px;
         padding: 10px;
         font-weight: 800;
         color: var(--muted);
+        transition:
+          background 0.18s ease,
+          color 0.18s ease,
+          box-shadow 0.18s ease;
       }
       .roles button.active {
         background: white;
@@ -139,10 +150,13 @@
       .field select,
       .field textarea {
         border: 1px solid var(--line);
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 12px;
         background: white;
         outline: 0;
+        transition:
+          border-color 0.18s ease,
+          box-shadow 0.18s ease;
       }
       .field input:focus,
       .field select:focus,
@@ -152,13 +166,26 @@
       }
       .btn {
         border: 0;
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 11px 14px;
         font-weight: 800;
         display: inline-flex;
         align-items: center;
         gap: 8px;
         justify-content: center;
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease,
+          background-color 0.18s ease;
+      }
+      .btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 7px 16px rgba(20, 32, 51, 0.12);
+      }
+      button:focus-visible,
+      a:focus-visible {
+        outline: 3px solid rgba(37, 99, 235, 0.45);
+        outline-offset: 3px;
       }
       .primary {
         background: var(--brand);
@@ -190,7 +217,7 @@
         width: 100%;
         min-height: 46px;
         border: 1px solid rgba(15, 118, 110, 0.28);
-        border-radius: 8px;
+        border-radius: 10px;
         background: #f0fdfa;
         color: var(--brand);
         display: inline-flex;
@@ -199,6 +226,15 @@
         gap: 8px;
         font-weight: 900;
         padding: 12px 14px;
+        transition:
+          background-color 0.18s ease,
+          border-color 0.18s ease,
+          transform 0.18s ease;
+      }
+      .auth-switch button:hover {
+        background: #dff8f3;
+        border-color: rgba(15, 118, 110, 0.5);
+        transform: translateY(-1px);
       }
       .auth-switch small {
         display: block;
@@ -1087,7 +1123,7 @@
             <i data-lucide="log-in"></i>Login</button
           ><button
             class="btn secondary"
-            onclick="toast('Admin se login details lein')"
+            onclick="toast('Please contact your PG administrator for sign-in details.')"
           >
             <i data-lucide="help-circle"></i>Need Help
           </button>
@@ -1349,7 +1385,7 @@
       }
       function openRegister() {
         modalTitle.textContent = "Tenant Registration";
-        modalBody.innerHTML = `<div class="field"><label>Full Name</label><input id="r_name" autocomplete="name"></div><div class="field"><label>Email</label><input id="r_email" type="email" autocomplete="email"></div><div class="field"><label>Phone Number</label><input id="r_phone" inputmode="numeric" maxlength="10" placeholder="10 digit mobile"></div><div class="field"><label>Aadhaar Number</label><input id="r_aadhaar" inputmode="numeric" maxlength="12" placeholder="12 digit Aadhaar"></div><div class="field"><label>Password</label><input id="r_password" type="password" autocomplete="new-password" placeholder="Minimum 10 characters"></div><div class="invoice-note">Aadhaar database mein masked format aur secure hash ke saath save hota hai. Admin verification ke baad room details assign karega.</div>`;
+        modalBody.innerHTML = `<div class="field"><label>Full Name</label><input id="r_name" autocomplete="name"></div><div class="field"><label>Email</label><input id="r_email" type="email" autocomplete="email"></div><div class="field"><label>Phone Number</label><input id="r_phone" inputmode="numeric" maxlength="10" placeholder="10 digit mobile"></div><div class="field"><label>Aadhaar Number</label><input id="r_aadhaar" inputmode="numeric" maxlength="12" placeholder="12 digit Aadhaar"></div><div class="field"><label>Password</label><input id="r_password" type="password" autocomplete="new-password" placeholder="Minimum 10 characters"></div><div class="invoice-note"        >Your Aadhaar number is stored in a masked format and protected with a secure hash. Room details will be assigned after an administrator verifies your registration.</div>`;
         modalActions.innerHTML = `<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" id="registerBtn" onclick="registerTenant()">${i("user-plus")}Register</button>`;
         modalWrap.classList.add("open");
         lucide.createIcons();
@@ -1373,7 +1409,7 @@
           email.value = payload.email;
           password.value = "";
           setLoginStatus(
-            "Registration saved. Admin verification pending; password se tenant login kar sakte hain.",
+            "Registration submitted. You can sign in as a tenant with your password after an administrator approves your registration.",
             "ok",
           );
           toast("Registration saved");
@@ -1554,7 +1590,7 @@
           dues = state.payments.filter(
             (p) => p.status === "pending" || p.status === "overdue",
           ).length;
-        return `<div class="grid g3">${stat("Awaiting verification", pending, "shield-check", "purple")}${stat("Pending dues", dues, "bell-ring", "orange")}${stat("UPI ID", settings.upiId || "Not set", "qr-code", "blue")}</div><div class="card"><div class="card-hd"><h2>Payment Setup</h2><button class="btn primary" onclick="openPaymentSettings()">${i("settings")}Edit QR / UPI</button></div><div class="card-body"><div class="payment-box"><img class="qr" src="${qrSrc(settings, 9500, "Rent")}" alt="Payment QR"><div><b>${settings.businessName || "StayWise PG"}</b><p style="color:var(--muted);line-height:1.6">UPI: ${settings.upiId || "-"}<br>Payee: ${settings.payeeName || "-"}<br>${settings.instructions || ""}</p><div class="invoice-note">Fraud control: tenant submit karne ke baad status <b>verification pending</b> hota hai. Admin bank/UPI statement match karke verify karega, tabhi final paid count hoga.</div></div></div></div></div>${cardTable(
+        return `<div class="grid g3">${stat("Awaiting verification", pending, "shield-check", "purple")}${stat("Pending dues", dues, "bell-ring", "orange")}${stat("UPI ID", settings.upiId || "Not set", "qr-code", "blue")}</div><div class="card"><div class="card-hd"><h2>Payment Setup</h2><button class="btn primary" onclick="openPaymentSettings()">${i("settings")}Edit QR / UPI</button></div><div class="card-body"><div class="payment-box"><img class="qr" src="${qrSrc(settings, 9500, "Rent")}" alt="Payment QR"><div><b>${settings.businessName || "StayWise PG"}</b><p style="color:var(--muted);line-height:1.6">UPI: ${settings.upiId || "-"}<br>Payee: ${settings.payeeName || "-"}<br>${paymentInstructions(settings.instructions)}</p><div class="invoice-note">For fraud prevention, submitted payments remain pending verification. An administrator will match each transaction against the bank or UPI statement before marking it as paid.</div></div></div></div></div>${cardTable(
           "Payment Ledger",
           `<button class="btn primary" onclick="openModal('payment')">${i("receipt")}New Due</button>`,
           q(state.payments, [
@@ -1667,7 +1703,7 @@
           paid = state.payments
             .filter((p) => p.status === "paid")
             .reduce((s, p) => s + p.amount, 0);
-        return `<div class="card"><div class="card-body profile"><div class="big-av">${(t.name || "T")[0]}</div><div><h2>${t.name || currentUser.name}</h2><p>Room ${t.room || "-"} • Monthly rent ${money(t.rent)} • Joined ${t.join || "-"}</p></div><button class="btn primary" onclick="go('my-payments')">${i("indian-rupee")}Pay Rent</button></div></div>${due.length ? `<div class="notice reminder"><b>Payment reminder</b><p>${due.length} due payment pending hai. Pay Now se QR/UPI options use karke transaction ID submit karein.</p><small>Due date: ${due[0].dueDate || "-"}</small></div>` : ""}<div class="grid g3">${stat("Room", t.room || "-", "bed", "blue")}${stat("Paid amount", money(paid), "receipt", "green")}${stat("Open issues", state.complaints.filter((c) => c.status === "open").length, "alert-circle", "orange")}</div><div class="grid g2"><div class="card"><div class="card-hd"><h2>Payment History</h2></div><div class="card-body">${table(
+        return `<div class="card"><div class="card-body profile"><div class="big-av">${(t.name || "T")[0]}</div><div><h2>${t.name || currentUser.name}</h2><p>Room ${t.room || "-"} • Monthly rent ${money(t.rent)} • Joined ${t.join || "-"}</p></div><button class="btn primary" onclick="go('my-payments')">${i("indian-rupee")}Pay Rent</button></div></div>${due.length ? `<div class="notice reminder"><b>Payment reminder</b><p>You have ${due.length} payment(s) due. Select Pay Now to view QR/UPI options and submit your transaction ID.</p><small>Due date: ${due[0].dueDate || "-"}</small></div>` : ""}<div class="grid g3">${stat("Room", t.room || "-", "bed", "blue")}${stat("Paid amount", money(paid), "receipt", "green")}${stat("Open issues", state.complaints.filter((c) => c.status === "open").length, "alert-circle", "orange")}</div><div class="grid g2"><div class="card"><div class="card-hd"><h2>Payment History</h2></div><div class="card-body">${table(
           state.payments.map((p) => ({
             ...p,
             amount: money(p.amount),
@@ -1761,9 +1797,17 @@
         }
         return actions.join(" ");
       }
+      function paymentInstructions(instructions, fallback = "") {
+        const legacy =
+          "Payment ke baad transaction ID submit karein. Admin verification ke baad payment final paid mark hoga.";
+        if (!instructions) return fallback;
+        if (instructions === legacy)
+          return "After paying, submit the transaction ID. Payment will be marked as paid after administrator verification.";
+        return instructions;
+      }
       function tenantPaymentSetup(amount = tenant().rent || 0, month = "Rent") {
         const s = state.paymentSettings || {};
-        return `<div class="payment-box"><img class="qr" src="${qrSrc(s, amount, month)}" alt="Payment QR"><div><b>${s.businessName || "StayWise PG"}</b><p style="color:var(--muted);line-height:1.6">UPI ID: ${s.upiId || "-"}<br>Payee: ${s.payeeName || "-"}<br>Phone: ${s.phone || "-"}</p><div class="pay-options">${payButtons(amount, month)}</div><div class="invoice-note">${s.instructions || "Payment ke baad transaction ID submit karein."}</div></div></div>`;
+        return `<div class="payment-box"><img class="qr" src="${qrSrc(s, amount, month)}" alt="Payment QR"><div><b>${s.businessName || "StayWise PG"}</b><p style="color:var(--muted);line-height:1.6">UPI ID: ${s.upiId || "-"}<br>Payee: ${s.payeeName || "-"}<br>Phone: ${s.phone || "-"}</p><div class="pay-options">${payButtons(amount, month)}</div><div class="invoice-note">${paymentInstructions(s.instructions, "After paying, submit the transaction ID for verification.")}</div></div></div>`;
       }
       function qrSrc(settings, amount, note) {
         if (settings?.qrImage) return settings.qrImage;
@@ -1786,7 +1830,7 @@
         const p = state.payments.find((x) => x.id === id),
           s = state.paymentSettings || {};
         modalTitle.textContent = `Pay ${p.month}`;
-        modalBody.innerHTML = `${tenantPaymentSetup(p.amount, p.month)}<div class="field"><label>Paid From</label><select id="m_method"><option>PhonePe</option><option>Google Pay</option><option>Paytm</option><option>BHIM UPI</option><option>Bank Transfer</option><option>Cash</option></select></div><div class="field"><label>Transaction ID / UTR</label><input id="m_txn" placeholder="Example: UPI123456789"></div><div class="field"><label>Note for admin</label><textarea id="m_note" rows="3" placeholder="Screenshot/reference details"></textarea></div><div class="invoice-note">Amount ${money(p.amount)} admin account ${s.upiId || "-"} par bhejne ke baad transaction ID submit karein. Admin verify karega, tab status paid hoga.</div>`;
+        modalBody.innerHTML = `${tenantPaymentSetup(p.amount, p.month)}<div class="field"><label>Paid From</label><select id="m_method"><option>PhonePe</option><option>Google Pay</option><option>Paytm</option><option>BHIM UPI</option><option>Bank Transfer</option><option>Cash</option></select></div><div class="field"><label>Transaction ID / UTR</label><input id="m_txn" placeholder="Example: UPI123456789"></div><div class="field"><label>Note for admin</label><textarea id="m_note" rows="3" placeholder="Screenshot/reference details"></textarea></div><div class="invoice-note">After sending ${money(p.amount)} to ${s.upiId || "-"}, submit your transaction ID for verification. The payment will be marked as paid after an administrator verifies it.</div>`;
         modalActions.innerHTML = `<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="submitPayment('${p.id}')">${i("send")}Submit for Verification</button>`;
         modalWrap.classList.add("open");
         lucide.createIcons();
@@ -1869,7 +1913,7 @@
       function openPaymentSettings() {
         const s = state.paymentSettings || {};
         modalTitle.textContent = "Payment QR / UPI Setup";
-        modalBody.innerHTML = `<div class="field"><label>Business Name</label><input id="m_business" value="${s.businessName || ""}"></div><div class="field"><label>UPI ID</label><input id="m_upi" value="${s.upiId || ""}" placeholder="yourname@upi"></div><div class="field"><label>Payee Name</label><input id="m_payee" value="${s.payeeName || ""}"></div><div class="field"><label>Phone</label><input id="m_phone" value="${s.phone || ""}"></div><div class="field"><label>Upload QR Image</label><input id="m_qr_file" type="file" accept="image/*" onchange="previewQrUpload(this)"></div><div class="payment-box"><img class="qr" id="m_qr_preview" src="${qrSrc(s, 9500, "Rent")}" alt="QR preview"><div class="invoice-note">Admin yahan apna PhonePe, Paytm, Google Pay ya bank UPI QR upload kar sakta hai. Upload ke baad tenants ko wahi QR dikhega.</div></div><div class="field"><label>QR Image URL optional</label><input id="m_qr" value="${s.qrImage || ""}" placeholder="Paste custom QR image URL"></div><div class="field"><label>Instructions</label><textarea id="m_inst" rows="4">${s.instructions || ""}</textarea></div>`;
+        modalBody.innerHTML = `<div class="field"><label>Business Name</label><input id="m_business" value="${s.businessName || ""}"></div><div class="field"><label>UPI ID</label><input id="m_upi" value="${s.upiId || ""}" placeholder="yourname@upi"></div><div class="field"><label>Payee Name</label><input id="m_payee" value="${s.payeeName || ""}"></div><div class="field"><label>Phone</label><input id="m_phone" value="${s.phone || ""}"></div><div class="field"><label>Upload QR Image</label><input id="m_qr_file" type="file" accept="image/*" onchange="previewQrUpload(this)"></div><div class="payment-box"><img class="qr" id="m_qr_preview" src="${qrSrc(s, 9500, "Rent")}" alt="QR preview"><div class="invoice-note">Upload your PhonePe, Paytm, Google Pay, or bank UPI QR code here. Tenants will see the uploaded QR code after you save it.</div></div><div class="field"><label>QR Image URL optional</label><input id="m_qr" value="${s.qrImage || ""}" placeholder="Paste custom QR image URL"></div><div class="field"><label>Instructions</label><textarea id="m_inst" rows="4">${paymentInstructions(s.instructions)}</textarea></div>`;
         modalActions.innerHTML = `<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="savePaymentSettings()">${i("save")}Save</button>`;
         modalWrap.classList.add("open");
         lucide.createIcons();
@@ -2024,7 +2068,7 @@
             { method: "POST", body: "{}" },
           );
           modalTitle.textContent = "Temporary Password";
-          modalBody.innerHTML = `<div class="invoice-note">Tenant temporary password:<br><b style="font-size:18px">${data.temporaryPassword}</b><br>Ye outbox me bhi queue ho gaya hai. Tenant ko privately share karein aur login ke baad password change karwayen.</div>`;
+          modalBody.innerHTML = `<div class="invoice-note">Temporary tenant password:<br><b style="font-size:18px">${data.temporaryPassword}</b><br>This password has also been added to the outbox. Share it with the tenant privately and ask them to change it after signing in.</div>`;
           modalActions.innerHTML = `<button class="btn primary" onclick="closeModal()">Done</button>`;
           modalWrap.classList.add("open");
           lucide.createIcons();

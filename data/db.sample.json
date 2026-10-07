@@ -48,7 +48,7 @@
     "payeeName": "StayWise PG",
     "phone": "9000000000",
     "qrImage": "",
-    "instructions": "Payment ke baad transaction ID submit karein. Admin verification ke baad payment final paid mark hoga."
+    "instructions": "After paying, submit the transaction ID. Payment will be marked as paid after administrator verification."
   },
   "complaints": [],
   "notices": [
